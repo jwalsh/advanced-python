@@ -1,0 +1,105 @@
+#+TITLE: Advanced Python Exercises
+
+* Topics
+
+1. [[file:decorators.py][Decorators]]
+   - Introduced in Python 2.4 (2005)
+   - Similar concepts: Annotations (Java), Attributes (C#)
+
+2. [[file:generators.py][Generators]]
+   - Introduced in Python 2.2 (2001)
+   - Similar concepts: Iterator (Java), IEnumerable (C#)
+
+3. [[file:context_managers.py][Context Managers]]
+   - Introduced in Python 2.5 (2006)
+   - Similar concepts: try-with-resources (Java), using (C#)
+
+4. [[file:metaclasses.py][Metaclasses]]
+   - Introduced in Python 2.2 (2001)
+   - Similar concepts: Reflection (Java), Reflection (C#)
+
+5. [[file:descriptors.py][Descriptors]]
+   - Introduced in Python 2.2 (2001)
+   - Similar concepts: Property (C#), Getter/Setter (Java)
+
+6. [[file:abstract_base_classes.py][Abstract Base Classes (ABC)]]
+   - Introduced in Python 2.6 (2008)
+   - Similar concepts: Interface (Java), Abstract Class (C#)
+
+7. [[file:coroutines_async.py][Coroutines and Asynchronous Programming]]
+   - Coroutines introduced in Python 2.5 (2006)
+   - Async/await syntax introduced in Python 3.5 (2015)
+   - Similar concepts: Coroutines (C#), CompletableFuture (Java)
+
+8. [[file:operator_overloading.py][Operator Overloading]]
+   - Introduced in Python 1.0 (1994)
+   - Similar concepts: Operator Overloading (C++), Operator Overloading (C#)
+
+9. [[file:advanced_comprehensions.py][Advanced List Comprehensions and Generator Expressions]]
+   - List comprehensions introduced in Python 2.0 (2000)
+   - Generator expressions introduced in Python 2.4 (2005)
+   - Similar concepts: Stream API (Java), LINQ (C#)
+
+10. [[file:closures.py][Closures]]
+    - Introduced in Python 2.2 (2001)
+    - Similar concepts: Lambda Expressions (Java), Anonymous Functions (C#)
+
+* Instructions
+
+For each topic, complete the exercise in the corresponding Python file.
+The exercises are designed to help you practice and understand the
+advanced Python language features.
+
+* Resources
+** Official Documentation
+   - [[https://docs.python.org/][Python Documentation]]
+   - [[https://docs.python.org/3/tutorial/index.html][Python Tutorial]]
+   - [[https://docs.python.org/3/library/index.html][Python Standard Library]]
+   - [[https://docs.python.org/3/reference/index.html][Python Language Reference]]
+
+** Books
+   - [[https://realpython.com/products/fluent-python/][Fluent Python]] by Luciano Ramalho
+   - [[https://realpython.com/products/python-workout/][Python Workout]] by Reuven M. Lerner
+   - [[https://realpython.com/products/practices-of-the-python-pro/][Practices of the Python Pro]] by Dane Hillard
+   - [[https://www.oreilly.com/library/view/effective-python-90/9780134854717/][Effective Python: 90 Specific Ways to Write Better Python]] by Brett Slatkin
+   - [[https://www.oreilly.com/library/view/python-cookbook-3rd/9781449357337/][Python Cookbook]] by David Beazley and Brian K. Jones
+   - [[https://www.oreilly.com/library/view/python-tricks-a/9781775093305/][Python Tricks: A Buffet of Awesome Python Features]] by Dan Bader
+
+** Online Tutorials and Courses
+   - [[https://realpython.com/][Real Python]]
+   - [[https://www.learnpython.org/][Learn Python]]
+   - [[https://www.codecademy.com/learn/learn-python][Codecademy: Learn Python]]
+   - [[https://www.coursera.org/specializations/python][Coursera: Python for Everybody Specialization]]
+   - [[https://www.edx.org/course/introduction-to-python-absolute-beginner][edX: Introduction to Python - Absolute Beginner]]
+   - [[https://www.udemy.com/course/complete-python-bootcamp/][Udemy: Complete Python Bootcamp]]
+   - [[https://wizardforcel.gitbooks.io/sicp-in-python/content/][SICP in Python]]
+
+** Blogs and Articles
+   - [[https://realpython.com/tutorials/advanced/][Real Python: Advanced Tutorials]]
+   - [[https://www.pythonforbeginners.com/][Python for Beginners]]
+   - [[https://www.fullstackpython.com/][Full Stack Python]]
+   - [[https://www.geeksforgeeks.org/python-programming-language/][GeeksforGeeks: Python Programming Language]]
+   - [[https://www.programiz.com/python-programming][Programiz: Python Programming]]
+
+** Communities and Forums
+   - [[https://stackoverflow.com/questions/tagged/python][Stack Overflow: Python Questions]]
+   - [[https://www.reddit.com/r/Python/][Reddit: Python Subreddit]]
+   - [[https://www.reddit.com/r/learnpython/][Reddit: Learn Python Subreddit]]
+   - [[https://python-forum.io/][Python Forum]]
+   - [[https://www.python.org/community/][Python.org Community]]
+
+** Podcasts
+   - [[https://realpython.com/podcasts/rpp/][Real Python Podcast]]
+   - [[https://talkpython.fm/][Talk Python To Me]]
+   - [[https://pythonbytes.fm/][Python Bytes]]
+   - [[https://www.pythonpodcast.com/][Podcast.__init__]]
+
+** YouTube Channels
+   - [[https://www.youtube.com/channel/UCCezIgC97PvUuR4_gbFUs5g][Corey Schafer]]
+   - [[https://www.youtube.com/channel/UC-QDfvrRIDB6F0bIO4I4HkQ][Real Python]]
+   - [[https://www.youtube.com/channel/UCWv7vMbMWH4-V0ZXdmDpPBA][Programming with Mosh]]
+   - [[https://www.youtube.com/channel/UCfv8cds8AfIM3UZtAWOz6Gg][Sentdex]]
+   - [[https://www.youtube.com/channel/UCu8xYGLic-dmiKlsLVdyQXg][Tech With Tim]]
+
+- Python Documentation: https://docs.python.org/
+- Real Python: https://realpython.com/
