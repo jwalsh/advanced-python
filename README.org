@@ -8,6 +8,7 @@ This repository contains a collection of exercises and examples covering advance
 #+begin_src sh
 make install 
 make venv
+make new-exercise
 #+end_src
 
 * Primary Topics
@@ -55,7 +56,7 @@ make venv
 
 ** [[file:domain_modeling.py][Domain Modeling with Classes]]
    - One-to-Many and Many-to-Many Relationships
-   - Modeling Produce, SKU, Tags, etc.
+   - Modeling Pet, Category, Tag
 
 ** [[file:decorators_with_arguments.py][Decorators with Arguments]]
    - Passing arguments to decorators

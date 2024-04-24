@@ -23,6 +23,10 @@ update:
 freeze:
 	$(VENV_NAME)/bin/$(PIP) freeze > requirements.txt
 
+# New Exercise Workspace
+new-exercise:
+	git checkout -b $(USER)-exercise-$(shell date +%Y%m%d-%H%M)
+
 # Lint Code
 lint:
 	$(VENV_NAME)/bin/flake8 .
