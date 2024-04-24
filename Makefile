@@ -27,6 +27,10 @@ freeze:
 new-exercise:
 	git checkout -b $(USER)-exercise-$(shell date +%Y%m%d-%H%M)
 
+# Solutions
+solutions:
+	git checkout -b solutions
+
 # Lint Code
 lint:
 	$(VENV_NAME)/bin/flake8 .
