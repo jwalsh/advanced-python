@@ -1,0 +1,51 @@
+# Compiled Python files
+*.pyc
+*.pyo
+__pycache__/
+
+# Virtual environment
+venv/
+env/
+.venv/
+
+# IDE and editor files
+.vscode/
+.idea/
+*.sublime-project
+*.sublime-workspace
+
+# Logs and databases
+*.log
+*.sqlite
+
+# OS generated files
+.DS_Store
+.DS_Store?
+._*
+.Spotlight-V100
+.Trashes
+ehthumbs.db
+Thumbs.db
+
+# Distribution and packaging
+dist/
+build/
+*.egg-info/
+*.egg
+
+# Coverage reports
+.coverage
+coverage.xml
+htmlcov/
+
+# Sensitive or personal information
+.env
+.secrets
+
+# Miscellaneous
+*.bak
+*.swp
+*.swo
+*.tmp
+*.orig
+*.rej
