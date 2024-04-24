@@ -43,10 +43,19 @@
 # - Print the string representation of each Pet object, including its category and tags.
 # - Verify that the relationships between pets, categories, and tags are properly established.
 
-# Step 6: Refactor the Pet.status attribute to use an Enum
+# (optional) Step 6: Refactor the Pet.status attribute to use an Enum
 # - Refactor the `status` attribute of the Pet class to use an Enum for the possible pet statuses ("available", "pending", "sold").
 # - Update the Pet class to use the Enum for the `status` attribute.
 # - Update the sample Pet objects to use the Enum for the `status` attribute.
+
+# (optional) Step 7: Add type hints to the classes
+# - Add type hints to the class attributes and method signatures to specify the expected types.
+
+# (optional) Step 8: Add docstrings to the classes and methods
+# - Add docstrings to the classes and methods to describe their purpose and functionality.
+
+# (optional) Step 8: Pet.remove_tag method
+# - Implement a `remove_tag` method in the Pet class that removes a tag from the list of tags based on the tag's ID.
 
 # Example usage:
 # category1 = Category(1, "Dogs")
