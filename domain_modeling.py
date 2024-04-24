@@ -43,6 +43,11 @@
 # - Print the string representation of each Pet object, including its category and tags.
 # - Verify that the relationships between pets, categories, and tags are properly established.
 
+# Step 6: Refactor the Pet.status attribute to use an Enum
+# - Refactor the `status` attribute of the Pet class to use an Enum for the possible pet statuses ("available", "pending", "sold").
+# - Update the Pet class to use the Enum for the `status` attribute.
+# - Update the sample Pet objects to use the Enum for the `status` attribute.
+
 # Example usage:
 # category1 = Category(1, "Dogs")
 # category2 = Category(2, "Cats")
