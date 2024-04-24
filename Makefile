@@ -35,6 +35,10 @@ test:
 run:
 	$(VENV_NAME)/bin/python main.py
 
+# Generate Data
+data.txt:
+	seq 10 > data.txt
+
 # Clean Up
 clean:
 	rm -rf $(VENV_NAME)
