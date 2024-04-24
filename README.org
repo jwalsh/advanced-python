@@ -1,6 +1,15 @@
 #+TITLE: Advanced Python Exercises
 #+AUTHOR: Jason Walsh <j@wal.sh>
 
+This repository contains a collection of exercises and examples covering advanced Python concepts and techniques. It is designed to help Python developers enhance their skills and gain a deeper understanding of the language's advanced features.
+
+* Getting Started
+
+#+begin_src sh
+make install 
+make venv
+#+end_src
+
 * Primary Topics
 ** [[file:decorators.py][Decorators]]
    - Introduced in Python 2.4 (2005)
@@ -124,7 +133,6 @@
 ** [[file:api_development.py][API Development]]
    - Designing and building APIs
    - Using frameworks like Flask and FastAPI
-
 
 * Foundational Topics
 ** [[file:variables_and_data_types.py][Variables and Data Types]]
