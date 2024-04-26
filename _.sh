@@ -3,162 +3,180 @@
 # Create the exercises directory
 mkdir -p exercises
 
-# Exercise 1: Design Patterns
-cat > exercises/design_patterns.py <<'EOL'
-# Exercise: Design Patterns
-# Implement a singleton pattern and a factory pattern in Python.
+# Exercise 1: System Design
+cat > exercises/parking_lot.py <<'EOL'
+# Exercise: Parking Lot System Design
+# Design a parking lot system that can handle different types of vehicles and parking spots.
 
-# Singleton Pattern
-class Singleton:
+from abc import ABC, abstractmethod
+
+class Vehicle(ABC):
     # Your code here
     pass
 
-# Factory Pattern
-class ShapeFactory:
+class Car(Vehicle):
+    # Your code here
+    pass
+
+class Motorcycle(Vehicle):
+    # Your code here
+    pass
+
+class ParkingSpot(ABC):
+    # Your code here
+    pass
+
+class CarSpot(ParkingSpot):
+    # Your code here
+    pass
+
+class MotorcycleSpot(ParkingSpot):
+    # Your code here
+    pass
+
+class ParkingLot:
     # Your code here
     pass
 
 if __name__ == "__main__":
-    # Test Singleton
-    s1 = Singleton()
-    s2 = Singleton()
-    print(s1 == s2)  # Output: True
+    parking_lot = ParkingLot(2, 1)
+    car1 = Car("ABC123")
+    car2 = Car("XYZ789")
+    motorcycle = Motorcycle("M1234")
 
-    # Test Factory
-    factory = ShapeFactory()
-    circle = factory.create_shape("circle")
-    square = factory.create_shape("square")
-    print(circle.draw())  # Output: Drawing a circle
-    print(square.draw())  # Output: Drawing a square
+    parking_lot.park_vehicle(car1)
+    parking_lot.park_vehicle(car2)
+    parking_lot.park_vehicle(motorcycle)
+
+    print(parking_lot.unpark_vehicle(car1))
+    print(parking_lot.unpark_vehicle(motorcycle))
 EOL
 
-cat > exercises/test_design_patterns.py <<'EOL'
+cat > exercises/test_parking_lot.py <<'EOL'
 import unittest
-from design_patterns import Singleton, ShapeFactory
+from parking_lot import ParkingLot, Car, Motorcycle
 
-class TestDesignPatterns(unittest.TestCase):
-    def test_singleton(self):
-        s1 = Singleton()
-        s2 = Singleton()
-        self.assertEqual(s1, s2)
+class TestParkingLot(unittest.TestCase):
+    def test_parking_lot(self):
+        parking_lot = ParkingLot(2, 1)
+        car1 = Car("ABC123")
+        car2 = Car("XYZ789")
+        motorcycle = Motorcycle("M1234")
 
-    def test_factory(self):
-        factory = ShapeFactory()
-        circle = factory.create_shape("circle")
-        square = factory.create_shape("square")
-        self.assertEqual(circle.draw(), "Drawing a circle")
-        self.assertEqual(square.draw(), "Drawing a square")
+        self.assertTrue(parking_lot.park_vehicle(car1))
+        self.assertTrue(parking_lot.park_vehicle(car2))
+        self.assertTrue(parking_lot.park_vehicle(motorcycle))
+
+        self.assertEqual(parking_lot.unpark_vehicle(car1), "ABC123")
+        self.assertEqual(parking_lot.unpark_vehicle(motorcycle), "M1234")
 
 if __name__ == "__main__":
     unittest.main()
 EOL
 
-# Exercise 2: Data Structures
-cat > exercises/lru_cache.py <<'EOL'
-# Exercise: LRU Cache
-# Implement an LRU (Least Recently Used) cache in Python.
+# Exercise 2: Architectural Patterns
+cat > exercises/event_driven_architecture.py <<'EOL'
+# Exercise: Event-Driven Architecture
+# Implement an event-driven architecture for a simple e-commerce application.
 
-class LRUCache:
-    def __init__(self, capacity):
-        # Your code here
-        pass
+class EventBus:
+    # Your code here
+    pass
 
-    def get(self, key):
-        # Your code here
-        pass
+class Order:
+    # Your code here
+    pass
 
-    def put(self, key, value):
-        # Your code here
-        pass
+class InventoryService:
+    # Your code here
+    pass
+
+class PaymentService:
+    # Your code here
+    pass
+
+class ShippingService:
+    # Your code here
+    pass
 
 if __name__ == "__main__":
-    cache = LRUCache(2)
-    cache.put(1, 1)
-    cache.put(2, 2)
-    print(cache.get(1))  # Output: 1
-    cache.put(3, 3)
-    print(cache.get(2))  # Output: -1
+    event_bus = EventBus()
+    inventory_service = InventoryService(event_bus)
+    payment_service = PaymentService(event_bus)
+    shipping_service = ShippingService(event_bus)
+
+    order = Order(1, "Product A", 10.0)
+    event_bus.publish("order_placed", order)
 EOL
 
-cat > exercises/test_lru_cache.py <<'EOL'
+cat > exercises/test_event_driven_architecture.py <<'EOL'
 import unittest
-from lru_cache import LRUCache
+from unittest.mock import MagicMock
+from event_driven_architecture import EventBus, Order, InventoryService, PaymentService, ShippingService
 
-class TestLRUCache(unittest.TestCase):
-    def test_lru_cache(self):
-        cache = LRUCache(2)
-        cache.put(1, 1)
-        cache.put(2, 2)
-        self.assertEqual(cache.get(1), 1)
-        cache.put(3, 3)
-        self.assertEqual(cache.get(2), -1)
+class TestEventDrivenArchitecture(unittest.TestCase):
+    def test_event_driven_architecture(self):
+        event_bus = EventBus()
+        inventory_service = InventoryService(event_bus)
+        payment_service = PaymentService(event_bus)
+        shipping_service = ShippingService(event_bus)
+
+        inventory_service.update_inventory = MagicMock()
+        payment_service.process_payment = MagicMock()
+        shipping_service.ship_order = MagicMock()
+
+        order = Order(1, "Product A", 10.0)
+        event_bus.publish("order_placed", order)
+
+        inventory_service.update_inventory.assert_called_once_with(order)
+        payment_service.process_payment.assert_called_once_with(order)
+        shipping_service.ship_order.assert_called_once_with(order)
 
 if __name__ == "__main__":
     unittest.main()
 EOL
 
-# Exercise 3: Concurrency
-cat > exercises/thread_safe_counter.py <<'EOL'
-# Exercise: Thread-Safe Counter
-# Implement a thread-safe counter in Python.
+# Exercise 3: Scalability and Performance
+cat > exercises/rate_limiter.py <<'EOL'
+# Exercise: Rate Limiter
+# Implement a rate limiter to control the rate of requests to an API.
 
-import threading
+import time
 
-class Counter:
-    def __init__(self):
+class RateLimiter:
+    def __init__(self, limit, window):
         # Your code here
         pass
 
-    def increment(self):
-        # Your code here
-        pass
-
-    def get_value(self):
+    def allow_request(self):
         # Your code here
         pass
 
 if __name__ == "__main__":
-    counter = Counter()
+    rate_limiter = RateLimiter(5, 10)  # 5 requests per 10 seconds
 
-    def worker():
-        for _ in range(100000):
-            counter.increment()
-
-    threads = []
-    for _ in range(5):
-        t = threading.Thread(target=worker)
-        threads.append(t)
-        t.start()
-
-    for t in threads:
-        t.join()
-
-    print(counter.get_value())  # Output: 500000
+    for _ in range(10):
+        if rate_limiter.allow_request():
+            print("Request allowed")
+        else:
+            print("Request blocked")
+        time.sleep(1)
 EOL
 
-cat > exercises/test_thread_safe_counter.py <<'EOL'
+cat > exercises/test_rate_limiter.py <<'EOL'
 import unittest
-from thread_safe_counter import Counter
-import threading
+from rate_limiter import RateLimiter
 
-class TestThreadSafeCounter(unittest.TestCase):
-    def test_counter(self):
-        counter = Counter()
+class TestRateLimiter(unittest.TestCase):
+    def test_rate_limiter(self):
+        rate_limiter = RateLimiter(5, 10)
 
-        def worker():
-            for _ in range(100000):
-                counter.increment()
-
-        threads = []
+        # Allow 5 requests
         for _ in range(5):
-            t = threading.Thread(target=worker)
-            threads.append(t)
-            t.start()
+            self.assertTrue(rate_limiter.allow_request())
 
-        for t in threads:
-            t.join()
-
-        self.assertEqual(counter.get_value(), 500000)
+        # Block the next request
+        self.assertFalse(rate_limiter.allow_request())
 
 if __name__ == "__main__":
     unittest.main()
@@ -166,4 +184,4 @@ EOL
 
 # More exercises...
 
-echo "Exercises and test files created successfully!"
+echo "Exercises and test files created successfully."
