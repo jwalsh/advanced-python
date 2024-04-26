@@ -1,0 +1,86 @@
+#!/bin/sh
+
+# Create the exercises directory
+mkdir -p exercises
+
+# Exercise 1: Fibonacci Sequence
+cat > exercises/fibonacci.py <<'EOL'
+# Exercise: Fibonacci Sequence
+# Write a function that generates the first n numbers in the Fibonacci sequence.
+
+def fibonacci(n):
+    # Your code here
+    pass
+
+if __name__ == "__main__":
+    print(fibonacci(10))  # Output: [0, 1, 1, 2, 3, 5, 8, 13, 21, 34]
+EOL
+
+cat > exercises/test_fibonacci.py <<'EOL'
+import unittest
+from fibonacci import fibonacci
+
+class TestFibonacci(unittest.TestCase):
+    def test_fibonacci(self):
+        self.assertEqual(fibonacci(10), [0, 1, 1, 2, 3, 5, 8, 13, 21, 34])
+
+if __name__ == "__main__":
+    unittest.main()
+EOL
+
+# Exercise 2: Palindrome Check
+cat > exercises/palindrome.py <<'EOL'
+# Exercise: Palindrome Check
+# Write a function that checks if a given string is a palindrome.
+
+def is_palindrome(s):
+    # Your code here
+    pass
+
+if __name__ == "__main__":
+    print(is_palindrome("racecar"))  # Output: True
+    print(is_palindrome("hello"))    # Output: False
+EOL
+
+cat > exercises/test_palindrome.py <<'EOL'
+import unittest
+from palindrome import is_palindrome
+
+class TestPalindrome(unittest.TestCase):
+    def test_is_palindrome(self):
+        self.assertTrue(is_palindrome("racecar"))
+        self.assertFalse(is_palindrome("hello"))
+
+if __name__ == "__main__":
+    unittest.main()
+EOL
+
+# Exercise 3: Reverse Words
+cat > exercises/reverse_words.py <<'EOL'
+# Exercise: Reverse Words
+# Write a function that reverses the order of words in a given sentence.
+
+def reverse_words(sentence):
+    # Your code here
+    pass
+
+if __name__ == "__main__":
+    print(reverse_words("Hello World!"))  # Output: "World! Hello"
+EOL
+
+cat > exercises/test_reverse_words.py <<'EOL'
+import unittest
+from reverse_words import reverse_words
+
+class TestReverseWords(unittest.TestCase):
+    def test_reverse_words(self):
+        self.assertEqual(reverse_words("Hello World!"), "World! Hello")
+
+if __name__ == "__main__":
+    unittest.main()
+EOL
+
+# More exercises...
+
+
+echo "Exercises and test files created successfully!"

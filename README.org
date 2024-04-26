@@ -97,27 +97,7 @@ make new-exercise
 * New Language Features
 
 ** [[file:python_3_8_features.py][Python 3.8 Features]]
-   - Assignment Expressions (Walrus Operator)
-   - Positional-only Arguments
-   - f-strings = f"{name=}"
-   - Python 3.8 Features
-
-** [[file:python_3_9_features.py][Python 3.9 Features]]
-   - Dictionary Merge and Update Operators
-   - Type Hinting for Built-in Types
-   - String Methods: removeprefix() and removesuffix()
-   - Python 3.9 Features
-
-** [[file:python_3_10_features.py][Python 3.10 Features]]
-   - Pattern Matching (Structural Pattern Matching)
-   - Parenthesized Context Managers
-   - Python 3.10 Features
-
-* Secondary Topics
-
-** [[file:namespacing.py][Namespacing]]
-   - Organizing code with namespaces
-   - Avoiding naming conflicts
+  - Avoiding naming conflicts
 
 ** [[file:library_development.py][Library Development]]
    - Creating reusable libraries

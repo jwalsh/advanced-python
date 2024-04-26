@@ -5,7 +5,9 @@ import time
 
 # Exercise 1: Create a decorator that prints the time taken by a function to execute
 def time_it(func):
-    pass
+    def wrapper(*args, **kwargs):
+    
+    return wrapper
 
 # Exercise 2: Create a decorator that prints the arguments passed to a function
 def print_args(func):

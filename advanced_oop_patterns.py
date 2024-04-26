@@ -13,6 +13,17 @@
 # - Create a class named 'Logger' that follows the Singleton pattern.
 # - Ensure that only one instance of the Logger class can be created.
 # - Implement a method named 'log' that prints a message to the console.
+class Logger:
+    _instance = None
+
+    def __new__(cls):
+        if cls._instance is None:
+            cls._instance = super().__new__(cls)
+        return cls._instance
+
+    def log(self, message):
+        print(message)
+
 
 # Step 2: Implement the Factory pattern
 # - Create an abstract base class named 'Shape' with an abstract method 'draw'.
