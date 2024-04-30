@@ -1,10 +1,11 @@
-# Insertion Sort 
+# Insertion Sort
 
 # Problem: Given a list of numbers, sort them in ascending order using the insertion sort algorithm.
 
-# Imports 
+# Imports
 
 # Code
+
 
 def insertion_sort(arr):
     """
@@ -16,10 +17,11 @@ def insertion_sort(arr):
         while j >= 0 and key < arr[j]:
             arr[j + 1] = arr[j]
             j -= 1
-        arr[j + 1] = key
+            arr[j + 1] = key
 
-     return arr
-   
+    return arr
+
+
 # Test the insertion_sort function
 arr = [12, 11, 13, 5, 6]
 
@@ -27,7 +29,7 @@ arr = [12, 11, 13, 5, 6]
 print(insertion_sort(arr))
 
 
-## 
+##
 
 
 # Insertion Sort
@@ -47,6 +49,7 @@ print(insertion_sort(arr))
 # Input:
 # pairs = [(5, "apple"), (2, "banana"), (9, "cherry")]
 
+
 def insertion_sort(pairs):
     """
     Sorts a list of key-value pairs by key using the Insertion Sort algorithm.
@@ -63,9 +66,10 @@ def insertion_sort(pairs):
         states.append(pairs.copy())
     return states
 
+
 # Output:
-# [[(5, "apple"), (2, "banana"), (9, "cherry")], 
-#  [(2, "banana"), (5, "apple"), (9, "cherry")], 
+# [[(5, "apple"), (2, "banana"), (9, "cherry")],
+#  [(2, "banana"), (5, "apple"), (9, "cherry")],
 #  [(2, "banana"), (5, "apple"), (9, "cherry")]]
 # Notice that the output shows the state of the array after each insertion. The last state is the final sorted array. There should be pairs.length states in total.
 
@@ -75,7 +79,7 @@ def insertion_sort(pairs):
 # pairs = [(3, "cat"), (3, "bird"), (2, "dog")]
 
 # Output:
-# [[(3, "cat"), (3, "bird"), (2, "dog")], 
+# [[(3, "cat"), (3, "bird"), (2, "dog")],
 #  [(3, "cat"), (3, "bird"), (2, "dog")],
 #  [(2, "dog"), (3, "cat"), (3, "bird")]]
 # In this example, you can observe that the pairs with key=3 ("cat" and "bird") maintain their relative order, illustrating the stability of the Insertion Sort algorithm.
@@ -89,30 +93,22 @@ def insertion_sort(pairs):
 # #         self.value = value
 # class Solution:
 #     def insertionSort(self, pairs: List[Pair]) -> List[List[Pair]]:
-        
 
 
-
-# Definition for a pair.
-# class Pair:
-#     def __init__(self, key: int, value: str):
-#         self.key = key
-#         self.value = value
-class Solution:
-    def insertionSort(self, pairs: List[Pair]) -> List[List[Pair]]:
-        states = [pairs.copy()]
-        for i in range(1, len(pairs)):
-            key = pairs[i]
-            j = i - 1
-            while j >= 0 and key.key < pairs[j].key:
-                pairs[j + 1] = pairs[j]
-                j -= 1
-            pairs[j + 1] = key
-            states.append(pairs.copy())
-        return states
-
-
-
-
-
-
+# # Definition for a pair.
+# # class Pair:
+# #     def __init__(self, key: int, value: str):
+# #         self.key = key
+# #         self.value = value
+# class Solution:
+#     def insertionSort(self, pairs: List[Pair]) -> List[List[Pair]]:
+#         states = [pairs.copy()]
+#         for i in range(1, len(pairs)):
+#             key = pairs[i]
+#             j = i - 1
+#             while j >= 0 and key.key < pairs[j].key:
+#                 pairs[j + 1] = pairs[j]
+#                 j -= 1
+#             pairs[j + 1] = key
+#             states.append(pairs.copy())
+#         return states
