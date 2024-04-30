@@ -3,6 +3,7 @@
 
 import threading
 
+
 class Counter:
     def __init__(self):
         # Your code here
@@ -15,6 +16,7 @@ class Counter:
     def get_value(self):
         # Your code here
         pass
+
 
 if __name__ == "__main__":
     counter = Counter()

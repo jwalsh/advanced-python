@@ -1,6 +1,13 @@
 import unittest
 from unittest.mock import MagicMock
-from event_driven_architecture import EventBus, Order, InventoryService, PaymentService, ShippingService
+from event_driven_architecture import (
+    EventBus,
+    Order,
+    InventoryService,
+    PaymentService,
+    ShippingService,
+)
+
 
 class TestEventDrivenArchitecture(unittest.TestCase):
     def test_event_driven_architecture(self):
@@ -19,6 +26,7 @@ class TestEventDrivenArchitecture(unittest.TestCase):
         inventory_service.update_inventory.assert_called_once_with(order)
         payment_service.process_payment.assert_called_once_with(order)
         shipping_service.ship_order.assert_called_once_with(order)
+
 
 if __name__ == "__main__":
     unittest.main()

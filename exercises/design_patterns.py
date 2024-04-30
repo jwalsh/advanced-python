@@ -1,15 +1,18 @@
 # Exercise: Design Patterns
 # Implement a singleton pattern and a factory pattern in Python.
 
+
 # Singleton Pattern
 class Singleton:
     # Your code here
     pass
 
+
 # Factory Pattern
 class ShapeFactory:
     # Your code here
     pass
+
 
 if __name__ == "__main__":
     # Test Singleton

@@ -1,6 +1,7 @@
 # Exercise: LRU Cache
 # Implement an LRU (Least Recently Used) cache in Python.
 
+
 class LRUCache:
     def __init__(self, capacity):
         # Your code here
@@ -13,6 +14,7 @@ class LRUCache:
     def put(self, key, value):
         # Your code here
         pass
+
 
 if __name__ == "__main__":
     cache = LRUCache(2)

@@ -1,6 +1,7 @@
 import unittest
 from parking_lot import ParkingLot, Car, Motorcycle
 
+
 class TestParkingLot(unittest.TestCase):
     def test_parking_lot(self):
         parking_lot = ParkingLot(2, 1)
@@ -14,6 +15,7 @@ class TestParkingLot(unittest.TestCase):
 
         self.assertEqual(parking_lot.unpark_vehicle(car1), "ABC123")
         self.assertEqual(parking_lot.unpark_vehicle(motorcycle), "M1234")
+
 
 if __name__ == "__main__":
     unittest.main()

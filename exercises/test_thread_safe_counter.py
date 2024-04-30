@@ -2,6 +2,7 @@ import unittest
 from thread_safe_counter import Counter
 import threading
 
+
 class TestThreadSafeCounter(unittest.TestCase):
     def test_counter(self):
         counter = Counter()
@@ -20,6 +21,7 @@ class TestThreadSafeCounter(unittest.TestCase):
             t.join()
 
         self.assertEqual(counter.get_value(), 500000)
+
 
 if __name__ == "__main__":
     unittest.main()

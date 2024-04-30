@@ -1,6 +1,7 @@
 import unittest
 from design_patterns import Singleton, ShapeFactory
 
+
 class TestDesignPatterns(unittest.TestCase):
     def test_singleton(self):
         s1 = Singleton()
@@ -13,6 +14,7 @@ class TestDesignPatterns(unittest.TestCase):
         square = factory.create_shape("square")
         self.assertEqual(circle.draw(), "Drawing a circle")
         self.assertEqual(square.draw(), "Drawing a square")
+
 
 if __name__ == "__main__":
     unittest.main()

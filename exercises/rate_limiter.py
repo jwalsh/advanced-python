@@ -3,6 +3,7 @@
 
 import time
 
+
 class RateLimiter:
     def __init__(self, limit, window):
         # Your code here
@@ -11,6 +12,7 @@ class RateLimiter:
     def allow_request(self):
         # Your code here
         pass
+
 
 if __name__ == "__main__":
     rate_limiter = RateLimiter(5, 10)  # 5 requests per 10 seconds
