@@ -1,3 +1,7 @@
+deps: # Install dependencies
+	poetry install
+	poetry run pip install black flake8 isort mypy
+
 black: # Run black 
 	poetry run python -m black .
 
@@ -7,10 +11,10 @@ isort: # Run isort
 
 .PHONY: lint
 lint: # Run linters
-	poetry run python -m flake8 .
-	poetry run python -m mypy .
 	poetry run python -m black --check .
 	poetry run python -m isort --check .
+	poetry run python -m flake8 .
+	poetry run python -m mypy .
 
 .PHONY: test
 test: # Run tests
@@ -19,3 +23,5 @@ test: # Run tests
 test-topk: # Run tests
 	poetry run python test_topk.py
 
+test-topk-clj: # Run tests
+	bb topk.clj
