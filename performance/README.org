@@ -1,0 +1,49 @@
+* Python Performance Optimization Exercises
+** Optimizing Database Queries
+   - Exercise: Identify a slow-running database query in a Python application.
+   - Monitoring:
+     - Baseline: Use database query profiling tools or logging statements to measure the execution time of the slow query.
+     - Suggested Improvement: Analyze the query execution plan, identify inefficient operations (e.g., full table scans), and optimize the query using techniques like indexing, query restructuring, or query parameterization.
+     - Improvement Demonstration: Re-run the optimized query and compare the execution time with the baseline, showcasing the performance improvement.
+
+** Improving Algorithm Efficiency
+   - Exercise: Optimize a computationally intensive algorithm implemented in Python.
+   - Monitoring:
+     - Baseline: Measure the execution time and resource utilization (e.g., CPU, memory) of the algorithm using profiling tools or timing functions.
+     - Suggested Improvement: Analyze the algorithm's time and space complexity, identify inefficient operations or data structures, and apply optimization techniques like memoization, dynamic programming, or algorithm redesign.
+     - Improvement Demonstration: Re-run the optimized algorithm and compare the execution time and resource utilization with the baseline, showcasing the performance improvement.
+
+** Caching Frequently Accessed Data
+   - Exercise: Identify a frequently accessed data source or computation result in a Python application.
+   - Monitoring:
+     - Baseline: Measure the response time and throughput of the application without caching, using load testing tools or application-level metrics.
+     - Suggested Improvement: Implement caching mechanisms, such as in-memory caching (e.g., using Redis or Memcached) or file-based caching, to store and retrieve frequently accessed data efficiently.
+     - Improvement Demonstration: Re-run the application with caching enabled and compare the response time and throughput with the baseline, showcasing the performance improvement.
+
+** Parallelizing CPU-Bound Tasks
+   - Exercise: Identify a CPU-bound task in a Python script or application.
+   - Monitoring:
+     - Baseline: Measure the execution time of the task using timing functions or profiling tools.
+     - Suggested Improvement: Utilize parallel processing techniques, such as multiprocessing or concurrent.futures, to distribute the workload across multiple CPU cores or machines.
+     - Improvement Demonstration: Re-run the parallelized task and compare the execution time with the baseline, showcasing the performance improvement.
+
+** Optimizing I/O Operations
+   - Exercise: Identify an I/O-bound operation, such as reading from or writing to a file or network socket, in a Python script or application.
+   - Monitoring:
+     - Baseline: Measure the execution time and I/O throughput using timing functions or profiling tools.
+     - Suggested Improvement: Optimize I/O operations by employing techniques like buffering, asynchronous I/O, or using efficient file formats (e.g., binary formats instead of text-based formats).
+     - Improvement Demonstration: Re-run the optimized I/O operation and compare the execution time and I/O throughput with the baseline, showcasing the performance improvement.
+
+** Leveraging FFI for Performance-Critical Code
+   - Exercise: Identify a performance-critical section of Python code that can benefit from FFI.
+   - Monitoring:
+     - Baseline: Measure the execution time of the Python code using timing functions or profiling tools.
+     - Suggested Improvement: Implement the performance-critical code in a lower-level language (e.g., C or Rust) and use FFI to interface with the Python code, leveraging the performance benefits of the lower-level language.
+     - Improvement Demonstration: Re-run the Python code with the FFI-optimized section and compare the execution time with the baseline, showcasing the performance improvement.
+
+** Utilizing GraalVM for JIT Compilation
+   - Exercise: Identify a Python application or script that can benefit from JIT compilation.
+   - Monitoring:
+     - Baseline: Measure the execution time of the Python code using timing functions or profiling tools.
+     - Suggested Improvement: Utilize GraalVM, a high-performance JIT compiler, to compile the Python code to native machine code, potentially improving performance.
+     - Improvement Demonstration: Run the Python code with GraalVM and compare the execution time with the baseline, showcasing the performance improvement.
