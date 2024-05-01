@@ -1,0 +1,3 @@
+* Multi-region Database
+
+This project involves designing and implementing a multi-region database architecture that can provide low latency access to data across multiple geographic regions while ensuring data consistency and replication.

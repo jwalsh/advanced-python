@@ -1,0 +1,3 @@
+* Global Load Balancer
+
+This project involves designing and implementing a global load balancing system that can distribute incoming traffic across multiple data centers and ensure high availability and optimal performance for users worldwide.

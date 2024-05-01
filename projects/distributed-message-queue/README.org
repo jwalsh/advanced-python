@@ -1,0 +1,3 @@
+* Distributed Message Queue
+
+This project involves designing and implementing a scalable and fault-tolerant distributed message queue system that can handle high throughput and ensure reliable message delivery between various components of a distributed system.

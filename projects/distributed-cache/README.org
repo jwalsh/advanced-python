@@ -1,0 +1,3 @@
+* Distributed Cache
+
+This project involves designing and implementing a distributed caching system that can handle high read/write throughput and provide low latency access to frequently accessed data.
