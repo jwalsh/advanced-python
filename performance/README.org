@@ -47,3 +47,23 @@
      - Baseline: Measure the execution time of the Python code using timing functions or profiling tools.
      - Suggested Improvement: Utilize GraalVM, a high-performance JIT compiler, to compile the Python code to native machine code, potentially improving performance.
      - Improvement Demonstration: Run the Python code with GraalVM and compare the execution time with the baseline, showcasing the performance improvement.
+
+** Optimizing PySpark Jobs
+   - Exercise: Identify a PySpark job that exhibits suboptimal performance.
+   - Monitoring:
+     - Baseline: Measure the execution time, resource utilization, and key metrics (e.g., shuffle read/write, stage duration) of the PySpark job using Spark's monitoring tools or by analyzing the Spark UI.
+     - Suggested Improvement: Optimize the PySpark job by considering techniques such as:
+       - Repartitioning data to achieve optimal parallelism and reduce data skew.
+       - Using broadcast variables for efficient distribution of small datasets.
+       - Caching frequently accessed DataFrames or RDDs to avoid redundant computations.
+       - Optimizing SQL queries and leveraging Spark's built-in optimizations (e.g., predicate pushdown, column pruning).
+     - Improvement Demonstration: Re-run the optimized PySpark job and compare the execution time, resource utilization, and key metrics with the baseline, showcasing the performance improvement.
+
+** Compiling Python to WebAssembly using Wasmer's py2wasm
+   - Exercise: Identify a Python program or module that can benefit from being compiled to WebAssembly using Wasmer's py2wasm compiler.
+   - Monitoring:
+     - Baseline: Measure the execution time of the Python program using the standard Python interpreter.
+     - Suggested Improvement: Use Wasmer's py2wasm compiler to convert the Python program to WebAssembly, leveraging the performance benefits of running Python code in a WebAssembly environment without interpreter overhead.
+     - Improvement Demonstration: Run the compiled WebAssembly module using Wasmer and compare the execution time with the baseline Python interpreter, showcasing the performance improvement achieved by py2wasm.
+
+
