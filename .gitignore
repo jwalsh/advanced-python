@@ -49,3 +49,14 @@ htmlcov/
 *.tmp
 *.orig
 *.rej
+
+# Emacs temp files
+*~
+\#*\#
+.#*
+*.org~
+auto-save-list/
+.org-id-locations
+*_archive
+*_flymake.*
+flycheck_*.el

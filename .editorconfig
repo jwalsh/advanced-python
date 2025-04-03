@@ -1,0 +1,36 @@
+# EditorConfig is awesome: https://EditorConfig.org
+
+# top-most EditorConfig file
+root = true
+
+# Unix-style newlines with a newline ending every file
+[*]
+end_of_line = lf
+insert_final_newline = true
+charset = utf-8
+indent_style = space
+indent_size = 4
+trim_trailing_whitespace = true
+max_line_length = 88
+
+# Python settings aligned with black formatter
+[*.py]
+indent_style = space
+indent_size = 4
+
+# Use 2 spaces for YAML files
+[*.{yml,yaml}]
+indent_style = space
+indent_size = 2
+
+# Tab indentation for Makefiles
+[Makefile]
+indent_style = tab
+
+# Markdown files
+[*.md]
+trim_trailing_whitespace = false
+
+# Org mode files
+[*.org]
+trim_trailing_whitespace = false
