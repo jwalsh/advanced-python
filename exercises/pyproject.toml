@@ -1,13 +1,43 @@
 [tool.poetry]
 name = "exercises"
 version = "0.1.0"
-description = ""
+description = "Advanced Python exercises"
 authors = ["Jason Walsh <j@wal.sh>"]
 readme = "README.md"
 
 [tool.poetry.dependencies]
 python = "^3.11"
+ipython = "^8.18.1"
 
+[tool.poetry.group.dev.dependencies]
+pylint = "^3.0.3"
+black = "^23.11.0"
+isort = "^5.12.0"
+mypy = "^1.6.1"
+flake8 = "^6.1.0"
+pytest = "^7.4.3"
+ipykernel = "^6.27.1"
+
+[tool.black]
+line-length = 88
+
+[tool.isort]
+profile = "black"
+
+[tool.mypy]
+check_untyped_defs = true
+disallow_untyped_defs = true
+disallow_incomplete_defs = true
+disallow_untyped_decorators = true
+disallow_any_generics = true
+disallow_subclassing_any = true
+warn_redundant_casts = true
+warn_unused_ignores = true
+no_implicit_reexport = true
+strict_optional = true
+
+[tool.pytest]
+testpaths = ["."]
 
 [build-system]
 requires = ["poetry-core"]
