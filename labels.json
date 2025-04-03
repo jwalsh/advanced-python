@@ -1,0 +1,177 @@
+[
+  {
+    "name": "bug",
+    "description": "Something isn't working",
+    "color": "d73a4a"
+  },
+  {
+    "name": "documentation",
+    "description": "Improvements or additions to documentation",
+    "color": "0075ca"
+  },
+  {
+    "name": "duplicate",
+    "description": "This issue or pull request already exists",
+    "color": "cfd3d7"
+  },
+  {
+    "name": "enhancement",
+    "description": "New feature or request",
+    "color": "a2eeef"
+  },
+  {
+    "name": "good first issue",
+    "description": "Good for newcomers",
+    "color": "7057ff"
+  },
+  {
+    "name": "help wanted",
+    "description": "Extra attention is needed",
+    "color": "008672"
+  },
+  {
+    "name": "invalid",
+    "description": "This doesn't seem right",
+    "color": "e4e669"
+  },
+  {
+    "name": "question",
+    "description": "Further information is requested",
+    "color": "d876e3"
+  },
+  {
+    "name": "wontfix",
+    "description": "This will not be worked on",
+    "color": "ffffff"
+  },
+  {
+    "name": "beginner",
+    "description": "Basic Python concepts for newcomers",
+    "color": "c5def5"
+  },
+  {
+    "name": "intermediate",
+    "description": "More complex Python patterns and libraries",
+    "color": "0366d6"
+  },
+  {
+    "name": "advanced",
+    "description": "Advanced language features and techniques",
+    "color": "0035a9"
+  },
+  {
+    "name": "exercise",
+    "description": "Practice problems for students",
+    "color": "01bb00"
+  },
+  {
+    "name": "solution",
+    "description": "Solution code for exercises",
+    "color": "fef2c0"
+  },
+  {
+    "name": "example",
+    "description": "Example code illustrating concepts",
+    "color": "1ce827"
+  },
+  {
+    "name": "functional-programming",
+    "description": "Lambda, map, reduce, HOF, FP concepts",
+    "color": "cc6699"
+  },
+  {
+    "name": "object-oriented",
+    "description": "Classes, inheritance, design patterns",
+    "color": "f9d0c4"
+  },
+  {
+    "name": "concurrency",
+    "description": "Threading, multiprocessing, async/await",
+    "color": "fbca04"
+  },
+  {
+    "name": "data-structures",
+    "description": "Lists, dictionaries, custom structures",
+    "color": "bfdadc"
+  },
+  {
+    "name": "algorithms",
+    "description": "Implementation techniques and analysis",
+    "color": "c5def5"
+  },
+  {
+    "name": "metaprogramming",
+    "description": "Decorators, metaclasses, reflection",
+    "color": "d4c5f9"
+  },
+  {
+    "name": "testing",
+    "description": "Unit tests, mocks, coverage",
+    "color": "ffc0cb"
+  },
+  {
+    "name": "performance",
+    "description": "Optimization, profiling, benchmarking",
+    "color": "e99695"
+  },
+  {
+    "name": "integration",
+    "description": "APIs, databases, external systems",
+    "color": "bfd4f2"
+  },
+  {
+    "name": "config",
+    "description": "Project configuration, tooling setup",
+    "color": "c2e0c6"
+  },
+  {
+    "name": "dependency",
+    "description": "Package management and dependencies",
+    "color": "bfdadc"
+  },
+  {
+    "name": "refactor",
+    "description": "Code cleanup without functional changes",
+    "color": "fbca04"
+  },
+  {
+    "name": "lecture",
+    "description": "Course lecture materials",
+    "color": "5319e7"
+  },
+  {
+    "name": "project",
+    "description": "Larger coding projects or assignments",
+    "color": "b60205"
+  },
+  {
+    "name": "homework",
+    "description": "Homework assignments",
+    "color": "0052cc"
+  },
+  {
+    "name": "lab",
+    "description": "Lab exercises with guided instruction",
+    "color": "006b75"
+  },
+  {
+    "name": "lambda-calculus",
+    "description": "Lambda calculus and formal language theory",
+    "color": "5319e7"
+  },
+  {
+    "name": "theory",
+    "description": "Computer science theory and concepts",
+    "color": "c5def5"
+  },
+  {
+    "name": "tool",
+    "description": "Development tools and utilities",
+    "color": "bfd4f2"
+  },
+  {
+    "name": "syllabus",
+    "description": "Course outline and schedule",
+    "color": "d876e3"
+  }
+]
