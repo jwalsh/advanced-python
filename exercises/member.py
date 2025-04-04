@@ -1,14 +1,18 @@
-import click
 from typing import Any, List, Optional
+
+import click
+
 
 def car(lst: List[Any]) -> Any:
     return lst[0]
+
 
 def cdr(lst: List[Any]) -> Optional[List[Any]]:
     if len(lst) == 1:
         return None
     else:
         return lst[1:]
+
 
 def member_p_recursion(x: Any, lst: List[Any]) -> bool:
     """
@@ -23,6 +27,7 @@ def member_p_recursion(x: Any, lst: List[Any]) -> bool:
         return True
     else:
         return member_p_recursion(x, cdr(lst))
+
 
 def member_p_loop(x: Any, lst: List[Any]) -> bool:
     """
@@ -39,6 +44,7 @@ def member_p_loop(x: Any, lst: List[Any]) -> bool:
                 return True
         return False
 
+
 def member_p_fold(x: Any, lst: List[Any]) -> bool:
     """
     Checks if a given element is a member of a list using the fold (reduce) function.
@@ -47,7 +53,9 @@ def member_p_fold(x: Any, lst: List[Any]) -> bool:
     :return: True if the element is found in the list, False otherwise.
     """
     from functools import reduce
+
     return reduce(lambda acc, y: acc or y == x, lst, False)
+
 
 member_p_tests = [
     {
@@ -88,6 +96,7 @@ member_p_tests = [
     },
 ]
 
+
 def run_tests(member_p_func):
     for test in member_p_tests:
         expected = test["expected"]
@@ -95,9 +104,14 @@ def run_tests(member_p_func):
         assert expected == result, test["name"]
     click.echo(f"All tests passed for {member_p_func.__name__}")
 
+
 @click.command()
-@click.option("--method", type=click.Choice(["recursion", "loop", "fold"]), default="recursion",
-              help="Method to check membership (recursion, loop, or fold)")
+@click.option(
+    "--method",
+    type=click.Choice(["recursion", "loop", "fold"]),
+    default="recursion",
+    help="Method to check membership (recursion, loop, or fold)",
+)
 def main(method):
     if method == "recursion":
         run_tests(member_p_recursion)
@@ -105,6 +119,7 @@ def main(method):
         run_tests(member_p_loop)
     elif method == "fold":
         run_tests(member_p_fold)
+
 
 if __name__ == "__main__":
     main()

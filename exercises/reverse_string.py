@@ -1,9 +1,10 @@
-# Prelude 
+# Prelude
 
 # Imports
 from typing import List
 
-# Code 
+# Code
+
 
 def reverse_string(s: str) -> str:
     """
@@ -11,7 +12,7 @@ def reverse_string(s: str) -> str:
     """
     stack = [char for char in s]
 
-    s = ''
+    s = ""
     while stack:
         s += stack.pop()
 

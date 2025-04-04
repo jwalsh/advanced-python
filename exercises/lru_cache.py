@@ -3,6 +3,7 @@
 
 from collections import OrderedDict
 
+
 @dataclass
 class LRUCache:
     def __init__(self, capacity):

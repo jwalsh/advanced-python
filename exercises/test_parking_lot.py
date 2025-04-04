@@ -1,5 +1,6 @@
 import unittest
-from parking_lot import ParkingLot, Car, Motorcycle
+
+from parking_lot import Car, Motorcycle, ParkingLot
 
 
 class TestParkingLot(unittest.TestCase):

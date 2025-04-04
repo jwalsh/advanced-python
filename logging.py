@@ -1,4 +1,4 @@
-# Prelude 
+# Prelude
 
 # Imports
 import logging

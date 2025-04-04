@@ -15,6 +15,7 @@
 # - Log the total number of classes created after each class creation.
 # - Return the newly created class using 'super().__new__()'.
 
+
 class LoggingMeta(type):
     class_count = 0
 
@@ -25,15 +26,19 @@ class LoggingMeta(type):
         print(f"Total classes created: {LoggingMeta.class_count}")
         return new_class
 
+
 # Step 2: Create classes using the LoggingMeta metaclass
 # - Create a few classes that use 'LoggingMeta' as their metaclass.
 # - Instantiate objects from these classes.
 
+
 class MyClass(metaclass=LoggingMeta):
     pass
 
+
 class AnotherClass(metaclass=LoggingMeta):
     pass
+
 
 obj1 = MyClass()
 obj2 = AnotherClass()
@@ -42,7 +47,7 @@ obj3 = MyClass()
 # Example usage:
 # class MyClass(metaclass=LoggingMeta):
 #     pass
-# 
+#
 # class AnotherClass(metaclass=LoggingMeta):
 #     pass
 #

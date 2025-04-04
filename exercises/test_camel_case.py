@@ -1,4 +1,5 @@
 import unittest
+
 from camel_case import to_camel_case
 
 

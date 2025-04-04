@@ -1,6 +1,7 @@
-import unittest
-from thread_safe_counter import Counter
 import threading
+import unittest
+
+from thread_safe_counter import Counter
 
 
 class TestThreadSafeCounter(unittest.TestCase):

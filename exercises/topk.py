@@ -1,8 +1,8 @@
 # Prelude
 # This takes a list of strings representing SKUs and returns the top k SKUs based on their frequency.
 
-from typing import List, Dict
 from collections import Counter
+from typing import Dict, List
 
 
 def top_k(sku_list: List[str], k: int) -> List[str]:

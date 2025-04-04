@@ -1,4 +1,4 @@
-# Problem: 
+# Problem:
 
 # This topic demonstrates how to use C extensions and FFI to speed up a long-running data processing task in Python. It involves generating a large number of random integers using the `jot` command and performing computations on those integers.
 

@@ -1,9 +1,10 @@
 import unittest
 from unittest.mock import MagicMock
+
 from event_driven_architecture import (
     EventBus,
-    Order,
     InventoryService,
+    Order,
     PaymentService,
     ShippingService,
 )

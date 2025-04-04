@@ -1,7 +1,9 @@
 # recruit_developer.py
 from dataclasses import dataclass
 from typing import List
+
 import click
+
 
 @dataclass
 class Applicant:
@@ -11,8 +13,10 @@ class Applicant:
     has_degree: bool
     email_address: str
 
+
 def schedule_interview(applicant: Applicant):
     print(f"Scheduled interview with {applicant.name}")
+
 
 @click.command()
 def main():
@@ -43,14 +47,11 @@ def main():
     for applicant in applicants:
         knows_python = "python" in applicant.programming_languages
         experienced_dev = applicant.years_of_experience >= 5
-        meets_criteria = (
-            knows_python
-            or experienced_dev
-            or applicant.has_degree
-        )
+        meets_criteria = knows_python or experienced_dev or applicant.has_degree
 
         if meets_criteria:
             schedule_interview(applicant)
+
 
 if __name__ == "__main__":
     main()

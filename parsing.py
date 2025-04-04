@@ -1,8 +1,10 @@
 import re
-from typing import Tuple, List, Dict, Union, Callable
+from typing import Callable, Dict, List, Tuple, Union
+
 import click
 
-Expression = Union[int, str, Tuple[str, 'Expression', 'Expression']]
+Expression = Union[int, str, Tuple[str, "Expression", "Expression"]]
+
 
 def parse_and_apply_lambda(expr: str, arg: int) -> Tuple[int, List[str]]:
     """
@@ -19,12 +21,12 @@ def parse_and_apply_lambda(expr: str, arg: int) -> Tuple[int, List[str]]:
         ValueError: If the lambda expression is invalid or contains unknown operators.
     """
     # Extract the parameter and body of the lambda expression
-    match = re.match(r'λ(\w+)\.(.*)', expr)
+    match = re.match(r"λ(\w+)\.(.*)", expr)
     if not match:
         raise ValueError("Invalid lambda expression")
-    
+
     param, body = match.groups()
-    
+
     def parse_expr(expr: str) -> Expression:
         """
         Parse a single expression within the lambda body.
@@ -43,31 +45,33 @@ def parse_and_apply_lambda(expr: str, arg: int) -> Tuple[int, List[str]]:
             return int(expr)
         elif expr.isalpha():
             return expr
-        elif expr.startswith('(') and expr.endswith(')'):
+        elif expr.startswith("(") and expr.endswith(")"):
             # Remove outer parentheses
             expr = expr[1:-1].strip()
-            
+
             # Find the main operator
             paren_count = 0
             for i, char in enumerate(expr):
-                if char == '(':
+                if char == "(":
                     paren_count += 1
-                elif char == ')':
+                elif char == ")":
                     paren_count -= 1
-                elif char in '+-*' and paren_count == 0:
+                elif char in "+-*" and paren_count == 0:
                     op = char
                     left = expr[:i].strip()
-                    right = expr[i+1:].strip()
+                    right = expr[i + 1 :].strip()
                     return (op, parse_expr(left), parse_expr(right))
-            
+
             # If no operator found at top level, parse the expression without outer parentheses
             return parse_expr(expr)
         else:
             raise ValueError(f"Unable to parse expression: {expr}")
-    
+
     parsed_body = parse_expr(body)
-    
-    def evaluate_step_by_step(expr: Expression, env: Dict[str, int]) -> Tuple[int, List[str]]:
+
+    def evaluate_step_by_step(
+        expr: Expression, env: Dict[str, int]
+    ) -> Tuple[int, List[str]]:
         """
         Evaluate the parsed expression step by step.
 
@@ -82,6 +86,7 @@ def parse_and_apply_lambda(expr: str, arg: int) -> Tuple[int, List[str]]:
             ValueError: If an unknown operator is encountered.
         """
         steps = []
+
         def evaluate(expr: Expression, env: Dict[str, int]) -> int:
             if isinstance(expr, int):
                 return expr
@@ -92,25 +97,26 @@ def parse_and_apply_lambda(expr: str, arg: int) -> Tuple[int, List[str]]:
                 left_val = evaluate(left, env)
                 right_val = evaluate(right, env)
                 result = None
-                if op == '+':
+                if op == "+":
                     result = left_val + right_val
-                elif op == '-':
+                elif op == "-":
                     result = left_val - right_val
-                elif op == '*':
+                elif op == "*":
                     result = left_val * right_val
                 else:
                     raise ValueError(f"Unknown operator: {op}")
                 steps.append(f"({op} {left_val} {right_val}) = {result}")
                 return result
-        
+
         result = evaluate(parsed_body, env)
         return result, steps
 
     return evaluate_step_by_step(parsed_body, {param: arg})
 
+
 @click.command()
-@click.argument('expression', default="λx.x")
-@click.argument('argument', type=int, default=1)
+@click.argument("expression", default="λx.x")
+@click.argument("argument", type=int, default=1)
 def main(expression: str, argument: int):
     """
     Parse and evaluate a lambda expression with a given argument.
@@ -130,8 +136,7 @@ def main(expression: str, argument: int):
         click.echo(f"Error: {str(e)}", err=True)
 
 
-
-if __name__ == '__main__':
+if __name__ == "__main__":
     main()
 
 
@@ -139,7 +144,7 @@ if __name__ == '__main__':
 test_cases = [
     ("λx.(+ x 1)", 2),
     ("λx.((- ((+ x) x)) 3)", 5),
-    ("λx.((- ((+ ((* x) x)) ((* 3) x))) 5)", 1)
+    ("λx.((- ((+ ((* x) x)) ((* 3) x))) 5)", 1),
 ]
 
 # for i, (expr, arg) in enumerate(test_cases, 1):

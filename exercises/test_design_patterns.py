@@ -1,5 +1,6 @@
 import unittest
-from design_patterns import Singleton, ShapeFactory
+
+from design_patterns import ShapeFactory, Singleton
 
 
 class TestDesignPatterns(unittest.TestCase):

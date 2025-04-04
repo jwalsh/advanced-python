@@ -9,6 +9,7 @@
 # 2. A shape factory class that creates different shapes based on a given type.
 # 3. An observable class that notifies its observers whenever its state changes.
 
+
 # Step 1: Implement the Singleton pattern
 # - Create a class named 'Logger' that follows the Singleton pattern.
 # - Ensure that only one instance of the Logger class can be created.
