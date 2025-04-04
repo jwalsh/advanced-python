@@ -1,0 +1,513 @@
+#+TITLE: IPython Integration Test
+#+AUTHOR: Jason Walsh
+#+OPTIONS: ^:nil toc:2 num:t
+#+PROPERTY: header-args:python :session *Python* :results output :exports both
+
+* Basic IPython Functionality Tests
+:PROPERTIES:
+:CUSTOM_ID: basic-tests
+:END:
+
+These tests will verify that IPython is working correctly within Org mode.
+
+#+begin_src python
+!pip install ipython
+#+end_src
+
+#+RESULTS:
+
+** Environment Check
+:PROPERTIES:
+:CUSTOM_ID: environment-check
+:END:
+
+First, let's check our Python environment and ensure IPython is available:
+
+#+BEGIN_SRC python
+import sys
+print(f"Python version: {sys.version}")
+
+# Check if IPython is available
+try:
+    import IPython
+    print(f"IPython version: {IPython.__version__}")
+    print(f"IPython is correctly loaded: {'IPython' in sys.modules}")
+    
+    # Get the current IPython instance
+    ipython = IPython.get_ipython()
+    if ipython:
+        print(f"Active IPython type: {type(ipython).__name__}")
+    else:
+        print("No active IPython instance found.")
+except ImportError:
+    print("IPython is not installed in this environment.")
+#+END_SRC
+
+#+RESULTS:
+: Python version: 3.11.2 (main, Nov 30 2024, 21:22:50) [GCC 12.2.0]
+: IPython is not installed in this environment.
+
+** Session Persistence Test
+:PROPERTIES:
+:CUSTOM_ID: session-persistence
+:END:
+
+Let's define a variable and verify it persists between code blocks:
+
+#+BEGIN_SRC python
+test_variable = "This variable should persist between code blocks"
+print(f"Defined: {test_variable}")
+#+END_SRC
+
+#+RESULTS:
+: Defined: This variable should persist between code blocks
+
+Now let's check if the variable is still accessible:
+
+#+BEGIN_SRC python
+try:
+    print(f"Retrieved: {test_variable}")
+except NameError:
+    print("ERROR: The variable was not persisted between code blocks!")
+#+END_SRC
+
+#+RESULTS:
+: Retrieved: This variable should persist between code blocks
+
+** IPython Magic Commands
+:PROPERTIES:
+:CUSTOM_ID: magic-commands
+:END:
+
+Test that IPython magic commands work:
+
+*** TODO System commands
+#+BEGIN_SRC python
+
+!echo "Running a system command"
+#+END_SRC
+
+*** TODO Python environment info
+#+BEGIN_SRC python
+%pylab --no-import-all
+%config InlineBackend.figure_format = 'svg'
+#+END_SRC
+
+*** TODO Time execution
+#+BEGIN_SRC python
+%time sum(range(1000000))
+#+END_SRC
+
+#+RESULTS:
+
+*** TODO List available magic commands
+
+#+BEGIN_SRC python
+print("\nAvailable magic commands:")
+%lsmagic
+#+END_SRC
+
+#+RESULTS:
+
+** Code Completion and Help
+:PROPERTIES:
+:CUSTOM_ID: code-completion
+:END:
+
+Test help and documentation features:
+
+#+BEGIN_SRC python
+# This block doesn't require you to press tab, but verifies
+# that IPython's rich help is working
+help(str.split)
+
+# Print docstring
+print("\nDocstring for max function:")
+print(max.__doc__)
+#+END_SRC
+
+#+RESULTS:
+#+begin_example
+Help on method_descriptor:
+
+split(self, /, sep=None, maxsplit=-1)
+    Return a list of the substrings in the string, using sep as the separator string.
+    
+      sep
+        The separator used to split the string.
+    
+        When set to None (the default value), will split on any whitespace
+        character (including \\n \\r \\t \\f and spaces) and will discard
+        empty strings from the result.
+      maxsplit
+        Maximum number of splits (starting from the left).
+        -1 (the default value) means no limit.
+    
+    Note, str.split() is mainly useful for data that has been intentionally
+    delimited.  With natural text that includes punctuation, consider using
+    the regular expression module.
+
+
+Docstring for max function:
+max(iterable, *[, default=obj, key=func]) -> value
+max(arg1, arg2, *args, *[, key=func]) -> value
+
+With a single iterable argument, return its biggest item. The
+default keyword-only argument specifies an object to return if
+the provided iterable is empty.
+With two or more arguments, return the largest argument.
+#+end_example
+
+* Advanced IPython Features
+:PROPERTIES:
+:CUSTOM_ID: advanced-features
+:END:
+
+** Debugging Integration
+:PROPERTIES:
+:CUSTOM_ID: debugging
+:END:
+
+Test debugger integration:
+
+#+BEGIN_SRC python
+def function_to_debug(n):
+    """A function with steps we can debug"""
+    result = 0
+    for i in range(n):
+        result += i * i
+    
+    # Uncomment to debug interactively
+    # import pdb; pdb.set_trace()
+    
+    return result
+
+# Run the function without debugging
+result = function_to_debug(5)
+print(f"Result: {result}")
+
+# How to use the debugger
+print("\nTo debug: uncomment the pdb line and re-run")
+print("Common pdb commands:")
+print("  n - next line")
+print("  s - step into function")
+print("  c - continue execution")
+print("  p <expr> - print expression")
+print("  q - quit debugging")
+#+END_SRC
+
+#+RESULTS:
+: Result: 30
+: 
+: To debug: uncomment the pdb line and re-run
+: Common pdb commands:
+:   n - next line
+:   s - step into function
+:   c - continue execution
+:   p <expr> - print expression
+:   q - quit debugging
+
+** Error Handling and Traceback
+:PROPERTIES:
+:CUSTOM_ID: error-handling
+:END:
+
+Test error traceback formatting:
+
+#+BEGIN_SRC python
+try:
+    # This will cause an error
+    1/0
+except Exception as e:
+    print(f"Caught exception: {type(e).__name__}: {e}")
+    
+    # Print traceback
+    import traceback
+    print("\nTraceback:")
+    traceback.print_exc()
+#+END_SRC
+
+#+RESULTS:
+: Caught exception: ZeroDivisionError: division by zero
+: 
+: Traceback:
+: Traceback (most recent call last):
+:   File "/tmp/python-m5zDDi", line 3, in <module>
+:     1/0
+:     ~^~
+: ZeroDivisionError: division by zero
+
+** Interactive Plotting
+:PROPERTIES:
+:CUSTOM_ID: plotting
+:END:
+
+Test matplotlib integration:
+
+#+BEGIN_SRC python
+import matplotlib.pyplot as plt
+import numpy as np
+
+# Create a simple plot
+x = np.linspace(0, 10, 100)
+y = np.sin(x)
+
+plt.figure(figsize=(8, 4))
+plt.plot(x, y, label='sin(x)')
+plt.title('Test Plot')
+plt.xlabel('x')
+plt.ylabel('y')
+plt.legend()
+plt.grid(True)
+
+# Save the figure to view it in Org mode
+plt.savefig('test_plot.png')
+print("Plot saved to test_plot.png")
+#+END_SRC
+
+#+RESULTS:
+
+** Poetry Environment Integration
+:PROPERTIES:
+:CUSTOM_ID: poetry-env
+:END:
+
+Test Poetry environment integration:
+
+#+BEGIN_SRC python
+# Try to import poetry
+try:
+    import poetry
+    print(f"Poetry is available: {poetry.__version__}")
+except ImportError:
+    print("Poetry module not directly importable (this is normal)")
+    
+# Check if we're in a virtual environment
+import os
+print(f"Using virtual environment: {'VIRTUAL_ENV' in os.environ}")
+if 'VIRTUAL_ENV' in os.environ:
+    print(f"Virtual env path: {os.environ['VIRTUAL_ENV']}")
+    
+# List installed packages
+print("\nInstalled packages:")
+!pip list | grep -E "ipython|numpy|matplotlib"
+#+END_SRC
+
+#+RESULTS:
+
+* Performance Tests
+:PROPERTIES:
+:CUSTOM_ID: performance
+:END:
+
+** Memory Usage
+:PROPERTIES:
+:CUSTOM_ID: memory
+:END:
+
+Check memory usage:
+
+#+BEGIN_SRC python
+# Try using memory_profiler if available
+try:
+    import memory_profiler
+    print("Memory profiler available")
+    
+    # Define a function to profile
+    @memory_profiler.profile
+    def memory_test():
+        """Test memory usage"""
+        # Create a large list
+        large_list = [i for i in range(1000000)]
+        return sum(large_list)
+    
+    # Run the function
+    result = memory_test()
+    print(f"Result: {result}")
+    
+except ImportError:
+    print("Memory profiler not available, install with: pip install memory_profiler")
+    
+    # Alternative memory usage check
+    import resource
+    usage = resource.getrusage(resource.RUSAGE_SELF)
+    print(f"Memory usage: {usage.ru_maxrss / 1024:.2f} MB")
+#+END_SRC
+
+#+RESULTS:
+: Memory profiler not available, install with: pip install memory_profiler
+: Memory usage: 13.81 MB
+
+** Execution Time
+:PROPERTIES:
+:CUSTOM_ID: timing
+:END:
+
+Test timing functions:
+
+#+BEGIN_SRC python
+import time
+
+# Define a function to time
+def time_test(n):
+    """Test function for timing"""
+    start = time.time()
+    result = sum(i * i for i in range(n))
+    end = time.time()
+    return result, end - start
+
+# Run with different inputs
+for n in [10000, 100000, 1000000]:
+    result, duration = time_test(n)
+    print(f"n={n}: result={result}, time={duration:.6f} seconds")
+
+# Use IPython's timing magic
+print("\nUsing %timeit:")
+%timeit sum(i * i for i in range(10000))
+#+END_SRC
+
+* Interactive Development Tests
+:PROPERTIES:
+:CUSTOM_ID: interactive-dev
+:END:
+
+** Code Editing and Re-evaluation
+:PROPERTIES:
+:CUSTOM_ID: code-editing
+:END:
+
+Let's create a function and then modify it:
+
+#+BEGIN_SRC python
+def calculate(x, y):
+    """Initial version of the function"""
+    return x + y
+
+print(f"Initial result: calculate(5, 3) = {calculate(5, 3)}")
+#+END_SRC
+
+Now modify the function and re-evaluate:
+
+#+BEGIN_SRC python
+# Modified version of the function
+def calculate(x, y):
+    """Modified version of the function"""
+    return x * y
+
+print(f"Modified result: calculate(5, 3) = {calculate(5, 3)}")
+#+END_SRC
+
+** Object Inspection
+:PROPERTIES:
+:CUSTOM_ID: object-inspection
+:END:
+
+Test object inspection features:
+
+#+BEGIN_SRC python
+import inspect
+
+# Create a class to inspect
+class TestClass:
+    """A test class for inspection"""
+    
+    def __init__(self, value):
+        self.value = value
+    
+    def double(self):
+        """Return twice the value"""
+        return self.value * 2
+    
+    def square(self):
+        """Return the square of the value"""
+        return self.value ** 2
+
+# Create an instance
+obj = TestClass(5)
+
+# Get source code
+print("Source code:")
+print(inspect.getsource(TestClass))
+
+# Get method list
+print("\nMethods:")
+for name, method in inspect.getmembers(obj, predicate=inspect.ismethod):
+    print(f"  {name}: {method.__doc__}")
+
+# Get attributes
+print("\nAttributes:")
+for name, value in inspect.getmembers(obj):
+    if not name.startswith('_') and not inspect.ismethod(value):
+        print(f"  {name}: {value}")
+#+END_SRC
+
+* Troubleshooting Tools
+:PROPERTIES:
+:CUSTOM_ID: troubleshooting
+:END:
+
+** Environment Diagnostics
+:PROPERTIES:
+:CUSTOM_ID: diagnostics
+:END:
+
+Tools for diagnosing environment issues:
+
+#+BEGIN_SRC python
+import sys
+import os
+
+# Python paths
+print("Python path:")
+for path in sys.path:
+    print(f"  {path}")
+
+# Environment variables
+print("\nKey environment variables:")
+for var in ['PYTHONPATH', 'VIRTUAL_ENV', 'PATH']:
+    if var in os.environ:
+        print(f"  {var}: {os.environ[var]}")
+    else:
+        print(f"  {var}: Not set")
+
+# Module locations
+print("\nModule locations:")
+for module_name in ['IPython', 'numpy', 'matplotlib']:
+    try:
+        module = __import__(module_name)
+        print(f"  {module_name}: {module.__file__}")
+    except ImportError:
+        print(f"  {module_name}: Not installed")
+#+END_SRC
+
+** Reset Session
+:PROPERTIES:
+:CUSTOM_ID: reset-session
+:END:
+
+How to reset the IPython session if needed:
+
+#+BEGIN_SRC python
+# To reset the IPython session, you can use:
+# %reset -f
+
+# Or to restart the kernel:
+# %kill_kernel
+# %connect_info
+
+print("To reset the session, uncomment and run either:")
+print("  %reset -f  (clear variables)")
+print("  %kill_kernel followed by %connect_info  (restart kernel)")
+#+END_SRC
+
+* Conclusion
+:PROPERTIES:
+:CUSTOM_ID: conclusion
+:END:
+
+This file has tested the core features of IPython integration with Org mode. If all the code blocks executed correctly, your IPython integration is working as expected.
+
+#+BEGIN_SRC python
+print("Test suite completed.")
+print("If you've reached this point without errors, your IPython integration is working.")
+#+END_SRC

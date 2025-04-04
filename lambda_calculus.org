@@ -1,0 +1,373 @@
+#+TITLE: Debugging Lambda Calculus with IPython and Python-mode
+#+AUTHOR: Jason Walsh
+#+OPTIONS: ^:nil toc:2 num:t
+#+PROPERTY: header-args:python :session *Python* :results output
+
+* Introduction
+:PROPERTIES:
+:CUSTOM_ID: introduction
+:END:
+
+This document demonstrates how to debug and interactively explore lambda calculus concepts using Org-mode, IPython, and Python-mode in Emacs. We'll use the directory-local variables configuration to ensure that Poetry is used throughout our development process.
+
+* Setup
+:PROPERTIES:
+:CUSTOM_ID: setup
+:END:
+
+First, let's confirm our IPython environment is working correctly:
+
+#+BEGIN_SRC python
+import sys
+print(f"Python version: {sys.version}")
+print(f"IPython available: {'IPython' in sys.modules}")
+#+END_SRC
+
+Let's also import some libraries we'll need:
+
+#+BEGIN_SRC python
+import inspect
+import functools
+import time
+#+END_SRC
+
+* Lambda Calculus Fundamentals
+:PROPERTIES:
+:CUSTOM_ID: lambda-calculus-fundamentals
+:END:
+
+** Basic Combinators
+:PROPERTIES:
+:CUSTOM_ID: basic-combinators
+:END:
+
+Let's implement the basic combinators and add debugging capabilities to trace their execution:
+
+#+BEGIN_SRC python
+def trace(func):
+    """Decorator to trace function calls with indentation based on call depth"""
+    # Use a list to store level as mutable object
+    trace.level = [0]
+    
+    @functools.wraps(func)
+    def wrapper(*args, **kwargs):
+        # Get argument names
+        arg_names = inspect.getfullargspec(func).args
+        args_repr = [repr(a) for a in args]
+        kwargs_repr = [f"{k}={v!r}" for k, v in kwargs.items()]
+        signature = ", ".join(args_repr + kwargs_repr)
+        
+        # Print function entry
+        indent = " " * trace.level[0]
+        print(f"{indent}→ {func.__name__}({signature})")
+        
+        # Increase indent
+        trace.level[0] += 2
+        
+        try:
+            # Call the function
+            result = func(*args, **kwargs)
+            
+            # Print function exit
+            indent = " " * trace.level[0]
+            print(f"{indent}← {func.__name__}() → {result!r}")
+            return result
+        finally:
+            # Decrease indent
+            trace.level[0] -= 2
+    
+    return wrapper
+
+@trace
+def I(x):
+    """Identity combinator: λx.x"""
+    return x
+
+@trace
+def K(x):
+    """Constant combinator: λx.λy.x"""
+    def K_inner(y):
+        return x
+    return K_inner
+
+@trace
+def S(x):
+    """Substitution combinator: λx.λy.λz.xz(yz)"""
+    def S_y(y):
+        def S_z(z):
+            return x(z)(y(z))
+        return S_z
+    return S_y
+#+END_SRC
+
+** Testing Combinators
+:PROPERTIES:
+:CUSTOM_ID: testing-combinators
+:END:
+
+Now let's test our combinators and observe their execution:
+
+#+BEGIN_SRC python
+print("Testing I combinator:")
+I(5)
+
+print("\nTesting K combinator:")
+k_result = K(3)
+k_result(7)
+
+print("\nTesting S K K 5:")
+# S(K)(K)(5) should be equivalent to I(5) = 5
+S(K)(K)(5)
+#+END_SRC
+
+** Y Combinator for Recursion
+:PROPERTIES:
+:CUSTOM_ID: y-combinator
+:END:
+
+Let's implement the Y combinator for recursion and use it to define factorial:
+
+#+BEGIN_SRC python
+@trace
+def Y(f):
+    """
+    Y combinator: λf.(λx.f(xx))(λx.f(xx))
+    
+    Note: This is a modified version that works in Python,
+    which uses eager evaluation.
+    """
+    def g(h):
+        return lambda *args: f(h(h))(*args)
+    return g(g)
+
+# Create factorial using Y combinator
+factorial_gen = lambda f: lambda n: 1 if n == 0 else n * f(n-1)
+factorial = Y(factorial_gen)
+
+# Test factorial
+print(f"factorial(5) = {factorial(5)}")
+#+END_SRC
+
+* Functional Data Structures
+:PROPERTIES:
+:CUSTOM_ID: functional-data-structures
+:END:
+
+** Pairs
+:PROPERTIES:
+:CUSTOM_ID: pairs
+:END:
+
+Let's implement pairs in the style of functional programming:
+
+#+BEGIN_SRC python
+@trace
+def pair(first_val, rest_val):
+    """Create a pair: λx.λy.λf.fxy"""
+    def pair_inner(selector):
+        return selector(first_val, rest_val)
+    return pair_inner
+
+@trace
+def first(p):
+    """Get the first element of a pair: λp.p(λx.λy.x)"""
+    return p(lambda x, y: x)
+
+@trace
+def rest(p):
+    """Get the rest element of a pair: λp.p(λx.λy.y)"""
+    return p(lambda x, y: y)
+
+# Test pairs
+print("Creating pair(1, 2):")
+p = pair(1, 2)
+print("\nGetting first element:")
+first_elem = first(p)
+print("\nGetting rest element:")
+rest_elem = rest(p)
+print(f"\nPair elements: first={first_elem}, rest={rest_elem}")
+#+END_SRC
+
+** Lists as Pairs
+:PROPERTIES:
+:CUSTOM_ID: lists
+:END:
+
+We can create lists using pairs:
+
+#+BEGIN_SRC python
+def make_list(*elements):
+    """Create a list from elements using pairs"""
+    result = None
+    for element in reversed(elements):
+        result = pair(element, result)
+    return result
+
+def to_python_list(lst):
+    """Convert our functional list to a Python list"""
+    result = []
+    current = lst
+    
+    while current is not None:
+        result.append(first(current))
+        current = rest(current)
+    
+    return result
+
+# Create a list
+print("Creating list [1, 2, 3, 4, 5]:")
+numbers = make_list(1, 2, 3, 4, 5)
+python_list = to_python_list(numbers)
+print(f"As Python list: {python_list}")
+#+END_SRC
+
+** Higher-order Functions
+:PROPERTIES:
+:CUSTOM_ID: higher-order-functions
+:END:
+
+Let's implement map and filter for our functional lists:
+
+#+BEGIN_SRC python
+@trace
+def map_list(func, lst):
+    """Map a function over a list implemented as pairs"""
+    if lst is None:
+        return None
+    return pair(func(first(lst)), map_list(func, rest(lst)))
+
+@trace
+def filter_list(predicate, lst):
+    """Filter a list implemented as pairs"""
+    if lst is None:
+        return None
+    
+    head = first(lst)
+    tail = rest(lst)
+    
+    if predicate(head):
+        return pair(head, filter_list(predicate, tail))
+    else:
+        return filter_list(predicate, tail)
+
+# Test map and filter
+print("Original list:", to_python_list(numbers))
+
+print("\nMapping (x * 2) over list:")
+doubled = map_list(lambda x: x * 2, numbers)
+print("Doubled:", to_python_list(doubled))
+
+print("\nFiltering even numbers:")
+evens = filter_list(lambda x: x % 2 == 0, numbers)
+print("Even numbers:", to_python_list(evens))
+#+END_SRC
+
+* Interactive Debugging with IPython and PDB
+:PROPERTIES:
+:CUSTOM_ID: debugging
+:END:
+
+** Setting Breakpoints
+:PROPERTIES:
+:CUSTOM_ID: breakpoints
+:END:
+
+Let's demonstrate how to set breakpoints and inspect variables:
+
+#+BEGIN_SRC python
+def complex_operation(n):
+    """A more complex operation to debug"""
+    result = 0
+    for i in range(n):
+        intermediate = i * i
+        result += intermediate
+    
+    # Uncomment to set a breakpoint
+    # import pdb; pdb.set_trace()
+    
+    for i in range(n, n*2):
+        result += i
+    
+    return result
+
+print(f"complex_operation(5) = {complex_operation(5)}")
+#+END_SRC
+
+** Inspecting the Call Stack
+:PROPERTIES:
+:CUSTOM_ID: call-stack
+:END:
+
+When debugging recursive functions, it's useful to examine the call stack:
+
+#+BEGIN_SRC python
+def recursive_sum(n):
+    """Sum numbers from 1 to n recursively"""
+    if n <= 0:
+        return 0
+    
+    # Uncomment to debug
+    # if n == 3:
+    #     import pdb; pdb.set_trace()
+    
+    return n + recursive_sum(n - 1)
+
+print(f"recursive_sum(5) = {recursive_sum(5)}")
+#+END_SRC
+
+** Using IPython Magic Commands
+:PROPERTIES:
+:CUSTOM_ID: ipython-magic
+:END:
+
+IPython provides many helpful magic commands for debugging and analysis:
+
+#+BEGIN_SRC python
+# Time execution
+print("Timing factorial(10):")
+%timeit factorial(10)
+
+# Debug a function
+def buggy_function(n):
+    result = []
+    for i in range(n):
+        result.append(i)
+    # This would cause an error
+    # result[n] = 42
+    return result
+
+print("\nResult of buggy_function(5):", buggy_function(5))
+
+# To debug this function, we would use:
+# %debug buggy_function(10)
+#+END_SRC
+
+* Metaprogramming and Reflection
+:PROPERTIES:
+:CUSTOM_ID: metaprogramming
+:END:
+
+** Inspecting Functions
+:PROPERTIES:
+:CUSTOM_ID: inspecting-functions
+:END:
+
+Let's use inspection to understand our combinators better:
+
+#+BEGIN_SRC python
+print("Inspecting the Y combinator:")
+print(inspect.getsource(Y))
+
+print("\nInspecting the factorial_gen lambda:")
+print(f"factorial_gen: {factorial_gen}")
+
+# Get function attributes
+print("\nAttributes of Y combinator:")
+for attr in dir(Y):
+    if not attr.startswith('__'):
+        print(f"  {attr}: {getattr(Y, attr)}")
+#+END_SRC
+
+** Creating Functions Dynamically
+:PROPERTIES:
+:CUSTOM_ID:
