@@ -11,7 +11,7 @@ ipython = "^8.18.1"
 
 [tool.poetry.group.dev.dependencies]
 pylint = "^3.0.3"
-black = "^23.11.0"
+black = "^24.3.0"
 isort = "^5.12.0"
 mypy = "^1.6.1"
 flake8 = "^6.1.0"
