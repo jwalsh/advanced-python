@@ -1,0 +1,83 @@
+#+TITLE: Lambda Calculus AST Explorer
+#+AUTHOR: jwalsh
+#+DATE: [2025-04-04]
+#+PROPERTY: header-args:python :tangle lambda_ast_explorer.py :mkdirp t
+
+* Lambda Calculus AST Explorer
+
+This tool explores the Abstract Syntax Trees (ASTs) of lambda calculus expressions in Python,
+focusing on pair, first, and rest functions with list representations.
+
+** Implementation
+
+#+begin_src python
+# full lambda_ast_explorer.py code here
+#+end_src
+
+** Example: List Construction and Manipulation
+
+Let's explore how the AST represents a simple list expression like '(1 2 3 '(4 5))
+
+#+begin_src python :results output
+from lambda_ast_explorer import make_list, first, rest, print_list
+
+# Create the list structure: (1 2 3 (4 5))
+nested_list = make_list(1, 2, 3, make_list(4, 5))
+
+# Print the list
+print("List representation:")
+print(print_list(nested_list))
+
+# Access elements
+print("\nAccessing elements:")
+print(f"First element: {first(nested_list)}")
+print(f"Rest of list: {print_list(rest(nested_list))}")
+print(f"Third element: {first(rest(rest(nested_list)))}")
+print(f"Nested list: {print_list(first(rest(rest(rest(nested_list)))))}")
+#+end_src
+
+** Mermaid Diagram: Lambda Calculus List Structure
+
+#+begin_src mermaid :file lambda_list_structure.png
+flowchart TD
+    A["pair(1, ...)"] -->|first| B[1]
+    A -->|rest| C["pair(2, ...)"]
+    C -->|first| D[2]
+    C -->|rest| E["pair(3, ...)"]
+    E -->|first| F[3]
+    E -->|rest| G["pair((4 5), ...)"]
+    G -->|first| H["pair(4, ...)"]
+    G -->|rest| I[None]
+    H -->|first| J[4]
+    H -->|rest| K["pair(5, ...)"]
+    K -->|first| L[5]
+    K -->|rest| M[None]
+#+end_src
+
+** Exploring AST Transformations
+
+Next, examine how Python's AST represents these lambda expressions.
+
+#+begin_src python :results output
+import ast
+import astunparse
+
+# Define a simple lambda expression
+expr = "lambda x: lambda y: x(y)"
+
+# Parse and print the AST
+tree = ast.parse(expr)
+print(ast.dump(tree, indent=2))
+
+# Modify the AST 
+# (example: transform to a composed function)
+transformed = ast.parse("lambda x, y: x(y)")
+print("\nTransformed AST:")
+print(ast.dump(transformed, indent=2))
+
+# Convert back to source code
+print("\nOriginal source:")
+print(astunparse.unparse(tree))
+print("\nTransformed source:")
+print(astunparse.unparse(transformed))
+#+end_src

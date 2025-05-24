@@ -1,0 +1,1694 @@
+#+TITLE: Python Interpreter Architecture and Internals
+#+AUTHOR: jwalsh
+#+DATE: [2025-04-04]
+#+PROPERTY: header-args:python :tangle python_interpreter_internals.py :mkdirp t
+
+* Python Interpreter Architecture and Internals
+
+This document explores the internal structure of Python interpreters, with a focus on CPython and IPython. It examines how Python code is processed, from parsing to execution, and the underlying mechanisms that make Python work.
+
+** 1. Overview of Python Interpreter Types
+
+Python has several implementations, each with different internals:
+
+- CPython (Reference Implementation)
+- PyPy (JIT-compiled)
+- Jython (Java-based)
+- IronPython (.NET-based)
+- MicroPython (Embedded systems)
+- IPython (Interactive shell built on CPython)
+
+We'll focus primarily on CPython as it's the reference implementation and most widely used.
+
+** 2. CPython Architecture
+
+#+begin_src mermaid :file cpython_architecture.png
+flowchart TD
+    A[Python Source Code] --> B[Lexer/Parser]
+    B --> C[AST Generation]
+    C --> D[Compiler]
+    D --> E[Bytecode]
+    E --> F[Python Virtual Machine]
+    F --> G[Result]
+
+    subgraph "Compiler Pipeline"
+    B
+    C
+    D
+    end
+
+    subgraph "Runtime"
+    E
+    F
+    end
+#+end_src
+
+The CPython interpreter's execution flow:
+
+1. *Lexical Analysis (Tokenization)*: Breaks source code into tokens
+2. *Parsing*: Converts tokens into an Abstract Syntax Tree (AST)
+3. *AST to Bytecode*: Compiles the AST into Python bytecode
+4. *Bytecode Execution*: The Python Virtual Machine (PVM) executes the bytecode
+
+*** 2.1 The Parser and AST Generation
+
+The parser reads Python source code and creates an Abstract Syntax Tree (AST) representation:
+
+#+begin_src python
+import ast
+
+# Sample Python code
+source_code = """
+def factorial(n):
+    if n <= 1:
+        return 1
+    else:
+        return n * factorial(n-1)
+"""
+
+# Parse into AST
+parsed_ast = ast.parse(source_code)
+
+# Print AST structure
+print(ast.dump(parsed_ast, indent=2))
+#+end_src
+
+The AST represents the logical structure of the program, independent of syntax details.
+
+*** 2.2 Compilation to Bytecode
+
+The AST is compiled to bytecode - a series of instructions for the Python Virtual Machine:
+
+#+begin_src python
+import dis
+
+def factorial(n):
+    if n <= 1:
+        return 1
+    else:
+        return n * factorial(n-1)
+
+# Disassemble to see bytecode
+dis.dis(factorial)
+#+end_src
+
+Bytecode is a lower-level representation that the PVM can efficiently execute. It's stored in `.pyc` files for faster loading on subsequent runs.
+
+*** 2.3 Python Virtual Machine (PVM)
+
+The PVM is a stack-based interpreter that executes bytecode instructions:
+
+#+begin_src mermaid :file pvm_execution.png
+flowchart LR
+    A[Bytecode] --> B[Instruction Pointer]
+    B --> C[Fetch]
+    C --> D[Decode]
+    D --> E[Execute]
+    E --> F[Update IP]
+    F --> C
+#+end_src
+
+Key components of the CPython VM:
+
+- *Frame Objects*: Execution contexts for function calls
+- *Code Objects*: Compiled bytecode and metadata
+- *Evaluation Loop*: The core execution engine
+
+** 3. Memory Management and Object Model
+
+*** 3.1 Object System
+
+Everything in Python is an object, built on a C structure called `PyObject`:
+
+#+begin_src mermaid :file pyobject_structure.png
+classDiagram
+    class PyObject {
+        ob_refcnt: reference count
+        ob_type: pointer to type
+    }
+    
+    class PyVarObject {
+        PyObject
+        ob_size: size of variable part
+    }
+    
+    PyObject <|-- PyVarObject
+    PyObject <|-- PyTypeObject
+    PyObject <|-- PyIntObject
+    PyObject <|-- PyStringObject
+    PyObject <|-- PyListObject
+    PyObject <|-- PyDictObject
+#+end_src
+
+*** 3.2 Memory Management
+
+CPython uses reference counting for memory management, supplemented by a cycle-detecting garbage collector:
+
+#+begin_src python
+import sys
+import gc
+
+# Create an object and check its reference count
+x = [1, 2, 3]
+print(f"Reference count: {sys.getrefcount(x) - 1}")  # -1 for getrefcount's own reference
+
+# Create a reference cycle
+a = []
+b = []
+a.append(b)
+b.append(a)
+
+# Force garbage collection
+gc.collect()
+print(f"Unreachable objects: {gc.get_count()}")
+#+end_src
+
+Key memory management components:
+- *Reference Counting*: Each object tracks how many references point to it
+- *Cyclic Garbage Collection*: Detects and removes reference cycles
+- *Object Allocators*: Special-purpose allocators for different object types
+
+** 4. From Source to Execution: A Complete Flow
+
+Let's trace a complete execution flow from source code to results:
+
+#+begin_src mermaid :file execution_flow.png
+sequenceDiagram
+    participant SRC as Source Code
+    participant PRS as Parser
+    participant AST as Abstract Syntax Tree
+    participant CMP as Compiler
+    participant BC as Bytecode
+    participant VM as Virtual Machine
+    participant MEM as Memory Manager
+    
+    SRC->>PRS: Read source
+    PRS->>AST: Generate AST
+    AST->>CMP: Compile
+    CMP->>BC: Generate bytecode
+    BC->>VM: Execute
+    VM->>MEM: Allocate/manage objects
+    MEM->>VM: Return objects
+    VM->>SRC: Return result
+#+end_src
+
+** 5. IPython Architecture
+
+IPython extends CPython with an enhanced interactive shell:
+
+#+begin_src mermaid :file ipython_architecture.png
+flowchart TD
+    A[User Input] --> B[Input Transformation]
+    B --> C[History]
+    B --> D[Magic Commands]
+    B --> E[Python Code]
+    E --> F[CPython Interpreter]
+    F --> G[Result]
+    G --> H[Rich Output Display]
+#+end_src
+
+Key IPython components:
+- *Interactive Shell*: Enhanced REPL with history, tab completion, etc.
+- *Magic Commands*: Special commands prefixed with `%` or `%%`
+- *Rich Display System*: Support for multimedia output
+- *Kernel Architecture*: Separation of frontend and computation
+
+** 6. Lambda Calculus Connection
+
+Python's functional features have roots in lambda calculus:
+
+#+begin_src python
+# Lambda calculus primitives in Python
+# Identity: λx.x
+identity = lambda x: x
+
+# Application: (λx.M)N
+apply = lambda f, x: f(x)
+
+# Composition: λf.λg.λx.f(g(x))
+compose = lambda f: lambda g: lambda x: f(g(x))
+
+# Church numerals
+zero = lambda f: lambda x: x
+one = lambda f: lambda x: f(x)
+two = lambda f: lambda x: f(f(x))
+
+# Successor function
+succ = lambda n: lambda f: lambda x: f(n(f)(x))
+
+# Addition
+add = lambda m: lambda n: lambda f: lambda x: m(f)(n(f)(x))
+
+# Test with real numbers
+def church_to_int(church):
+    return church(lambda x: x + 1)(0)
+
+print(f"1 + 2 = {church_to_int(add(one)(two))}")
+#+end_src
+
+The connection to Python internals:
+- Python's closure mechanism implements lexical scoping similar to lambda calculus
+- Higher-order functions are directly supported
+- The bytecode for lambda expressions shows their implementation
+
+** 7. Understanding Python Bytecode in Depth
+
+Python bytecode instructions operate on a stack machine model:
+
+#+begin_src python
+def analyze_bytecode(func):
+    """Analyze the bytecode of a function"""
+    print(f"Function: {func.__name__}")
+    
+    # Get code object
+    code = func.__code__
+    
+    print(f"Argument count: {code.co_argcount}")
+    print(f"Local variables: {code.co_varnames}")
+    print(f"Constants: {code.co_consts}")
+    print(f"Names: {code.co_names}")
+    
+    print("\nBytecode disassembly:")
+    dis.dis(func)
+    
+    print("\nBytecode hex dump:")
+    print(" ".join(f"{b:02x}" for b in code.co_code))
+
+# Example functions to analyze
+def simple_function(x):
+    y = x + 1
+    return y * 2
+
+# Lambda version of the same function
+lambda_version = lambda x: (x + 1) * 2
+
+# Analyze both
+analyze_bytecode(simple_function)
+analyze_bytecode(lambda_version)
+#+end_src
+
+Key bytecode concepts:
+- *Stack-based operations*: Most instructions push or pop from the stack
+- *Local variables*: Accessed by index, not name
+- *Function calls*: Arguments pushed onto stack before call
+- *Block management*: Special instructions for loops, conditionals
+
+** 8. Frame Objects and the Call Stack
+
+Frame objects represent the execution context:
+
+#+begin_src python
+def inspect_frame():
+    frame = sys._getframe()
+    print(f"Current function: {frame.f_code.co_name}")
+    print(f"Caller function: {frame.f_back.f_code.co_name if frame.f_back else None}")
+    print(f"Line number: {frame.f_lineno}")
+    print(f"Local variables: {frame.f_locals}")
+
+def outer():
+    x = 42
+    def inner():
+        y = 100
+        inspect_frame()
+    inner()
+
+outer()
+#+end_src
+
+Frame objects link together to form the call stack, tracking:
+- Local and global variables
+- Block stack (for loops, try/except, etc.)
+- Last instruction executed
+- References to other frames
+
+** 9. Custom Bytecode Manipulation
+
+For advanced exploration, we can create and manipulate code objects directly:
+
+#+begin_src python
+import types
+
+# Create a code object from scratch
+code = types.CodeType(
+    0,                      # argcount
+    0,                      # kwonlyargcount
+    0,                      # nlocals
+    2,                      # stacksize
+    67,                     # flags
+    bytes([100, 0, 0, 83]), # bytecode (LOAD_CONST, RETURN_VALUE)
+    (42,),                  # constants
+    (),                     # names
+    (),                     # varnames
+    "custom.py",            # filename
+    "custom_code",          # name
+    1,                      # firstlineno
+    bytes(),                # lnotab
+    (),                     # freevars
+    ()                      # cellvars
+)
+
+# Create a function from the code object
+func = types.FunctionType(code, globals(), "custom_function")
+
+# Execute it
+result = func()
+print(f"Result: {result}")  # Should print 42
+#+end_src
+
+This demonstrates the relationship between code objects and functions.
+
+** 10. Resources for Further Exploration
+
+For deeper understanding of Python internals:
+
+- CPython source code: https://github.com/python/cpython
+- Python Developer's Guide: https://devguide.python.org/
+- Python Language Reference: https://docs.python.org/3/reference/
+- "CPython Internals" by Anthony Shaw
+
+** 11. Practical Experiments
+
+*** 11.1 Custom AST Transformer
+
+Create a custom AST transformer to modify Python code:
+
+#+begin_src python
+import ast
+
+class ConstantFolder(ast.NodeTransformer):
+    """AST transformer that folds constant expressions"""
+    
+    def visit_BinOp(self, node):
+        # First, visit children (recursive transformation)
+        self.generic_visit(node)
+        
+        # Check if both operands are constants
+        if isinstance(node.left, ast.Constant) and isinstance(node.right, ast.Constant):
+            # Evaluate the operation
+            if isinstance(node.op, ast.Add):
+                result = node.left.value + node.right.value
+            elif isinstance(node.op, ast.Mult):
+                result = node.left.value * node.right.value
+            elif isinstance(node.op, ast.Sub):
+                result = node.left.value - node.right.value
+            elif isinstance(node.op, ast.Div):
+                result = node.left.value / node.right.value
+            else:
+                # Unsupported operation
+                return node
+                
+            # Replace the binary operation with a constant
+            return ast.Constant(value=result)
+        
+        return node
+
+# Example usage
+source = """
+def example():
+    x = 2 + 3 * 4
+    return x
+"""
+
+# Parse the code
+tree = ast.parse(source)
+
+# Apply the transformation
+folded_tree = ConstantFolder().visit(tree)
+
+# Compile and execute the transformed AST
+code = compile(folded_tree, "<string>", "exec")
+namespace = {}
+exec(code, namespace)
+
+# Call the function
+result = namespace["example"]()
+print(f"Result: {result}")  # Should print 14
+#+end_src
+
+*** 11.2 Custom Opcode Implementation
+
+Explore how Python opcodes work by implementing a simple interpreter:
+
+#+begin_src python
+def mini_interpreter(code_obj, globals_dict=None, locals_dict=None):
+    """A simplified Python bytecode interpreter"""
+    if globals_dict is None:
+        globals_dict = {}
+    if locals_dict is None:
+        locals_dict = {}
+        
+    # Create a stack for values
+    stack = []
+    
+    # Get bytecode
+    bytecode = code_obj.co_code
+    
+    # Process bytecode instructions
+    i = 0
+    while i < len(bytecode):
+        # Get operation code
+        opcode = bytecode[i]
+        
+        # Process operation
+        if opcode == dis.opmap['LOAD_CONST']:
+            # Get constant index (next byte)
+            const_idx = bytecode[i + 1]
+            # Get constant value and push to stack
+            const = code_obj.co_consts[const_idx]
+            stack.append(const)
+            i += 2  # Skip to next instruction
+            
+        elif opcode == dis.opmap['BINARY_ADD']:
+            # Pop two values, add them, and push result
+            b = stack.pop()
+            a = stack.pop()
+            stack.append(a + b)
+            i += 1  # Move to next instruction
+            
+        elif opcode == dis.opmap['RETURN_VALUE']:
+            # Return the top of the stack
+            return stack.pop()
+            
+        else:
+            # Unsupported opcode
+            raise ValueError(f"Unsupported opcode: {opcode}")
+    
+    # If we get here, there was no return statement
+    return None
+
+# Example usage
+simple_code = compile("1 + 2", "<string>", "eval")
+result = mini_interpreter(simple_code)
+print(f"Result: {result}")  # Should print 3
+#+end_src
+
+** 12. Lambda Calculus Parser and Interpreter
+
+Let's create a lambda calculus parser and interpreter that converts lambda expressions to Python bytecode:
+
+#+begin_src python :tangle lambda_calculus_parser.py :mkdirp t
+"""
+Lambda Calculus Parser and Interpreter
+
+This module implements a parser and interpreter for a simplified lambda calculus syntax,
+translating it to Python bytecode for execution.
+"""
+
+import ast
+import re
+import dis
+import types
+import inspect
+from pprint import pprint
+
+class LambdaParser:
+    """Parser for lambda calculus expressions"""
+    
+    def __init__(self):
+        self.tokens = []
+        self.position = 0
+    
+    def tokenize(self, text):
+        """Convert input string to tokens"""
+        # Token patterns
+        patterns = [
+            ('LPAREN', r'\('),
+            ('RPAREN', r'\)'),
+            ('LAMBDA', r'lambda'),
+            ('COLON', r':'),
+            ('IF', r'if'),
+            ('THEN', r'then'),
+            ('ELSE', r'else'),
+            ('RECUR', r'recur'),
+            ('NUMBER', r'\d+'),
+            ('OPERATOR', r'[\+\-\*/<>=]+'),
+            ('IDENTIFIER', r'[a-zA-Z_][a-zA-Z0-9_]*'),
+            ('COMMA', r','),
+            ('WHITESPACE', r'\s+'),
+        ]
+        
+        token_regex = '|'.join(f'(?P<{name}>{pattern})' for name, pattern in patterns)
+        
+        self.tokens = []
+        for match in re.finditer(token_regex, text):
+            token_type = match.lastgroup
+            token_value = match.group()
+            
+            if token_type != 'WHITESPACE':  # Skip whitespace
+                self.tokens.append((token_type, token_value))
+        
+        self.position = 0
+        return self.tokens
+    
+    def current_token(self):
+        """Get the current token"""
+        if self.position < len(self.tokens):
+            return self.tokens[self.position]
+        return None
+    
+    def next_token(self):
+        """Advance to the next token and return it"""
+        self.position += 1
+        return self.current_token()
+    
+    def expect(self, token_type):
+        """Expect a token of specific type, consume and return it"""
+        token = self.current_token()
+        if token and token[0] == token_type:
+            self.next_token()
+            return token
+        raise SyntaxError(f"Expected {token_type}, got {token}")
+    
+    def parse(self, text):
+        """Parse a lambda calculus expression and return an AST"""
+        self.tokenize(text)
+        return self.parse_expression()
+    
+    def parse_expression(self):
+        """Parse an expression"""
+        token = self.current_token()
+        
+        if not token:
+            raise SyntaxError("Unexpected end of input")
+        
+        if token[0] == 'LPAREN':
+            # Parse a parenthesized expression or lambda
+            self.next_token()  # Consume '('
+            
+            # Check if it's a lambda
+            if self.current_token() and self.current_token()[0] == 'LAMBDA':
+                return self.parse_lambda()
+            
+            # Regular parenthesized expression
+            expr = self.parse_expression()
+            self.expect('RPAREN')  # Consume ')'
+            return expr
+            
+        elif token[0] == 'LAMBDA':
+            # Lambda expression
+            return self.parse_lambda()
+            
+        elif token[0] == 'IF':
+            # If expression
+            return self.parse_if()
+            
+        elif token[0] == 'NUMBER':
+            # Number literal
+            value = int(token[1])
+            self.next_token()  # Consume number
+            return {'type': 'literal', 'value': value}
+            
+        elif token[0] == 'IDENTIFIER':
+            # Variable reference or function call
+            name = token[1]
+            self.next_token()  # Consume identifier
+            
+            # Check if it's a function call
+            if self.current_token() and self.current_token()[0] == 'LPAREN':
+                return self.parse_function_call(name)
+            
+            return {'type': 'variable', 'name': name}
+            
+        elif token[0] == 'RECUR':
+            # Recursive call
+            self.next_token()  # Consume 'recur'
+            
+            # Parse arguments
+            args = []
+            self.expect('LPAREN')
+            
+            while self.current_token() and self.current_token()[0] != 'RPAREN':
+                args.append(self.parse_expression())
+                
+                # Check for comma separator
+                if self.current_token() and self.current_token()[0] == 'COMMA':
+                    self.next_token()  # Consume comma
+            
+            self.expect('RPAREN')  # Consume ')'
+            
+            return {'type': 'recur', 'args': args}
+            
+        else:
+            raise SyntaxError(f"Unexpected token: {token}")
+    
+    def parse_lambda(self):
+        """Parse a lambda expression"""
+        self.next_token()  # Consume 'lambda'
+        
+        # Parse parameter(s)
+        params = []
+        
+        # Check for opening parenthesis for multiple params
+        if self.current_token() and self.current_token()[0] == 'LPAREN':
+            self.next_token()  # Consume '('
+            
+            while self.current_token() and self.current_token()[0] != 'RPAREN':
+                param_token = self.expect('IDENTIFIER')
+                params.append(param_token[1])
+                
+                # Check for comma separator
+                if self.current_token() and self.current_token()[0] == 'COMMA':
+                    self.next_token()  # Consume comma
+            
+            self.expect('RPAREN')  # Consume ')'
+        else:
+            # Single parameter
+            param_token = self.expect('IDENTIFIER')
+            params.append(param_token[1])
+        
+        # Parse body
+        self.expect('COLON')  # Consume ':'
+        body = self.parse_expression()
+        
+        return {
+            'type': 'lambda',
+            'params': params,
+            'body': body
+        }
+    
+    def parse_if(self):
+        """Parse an if expression"""
+        self.next_token()  # Consume 'if'
+        
+        condition = self.parse_expression()
+        
+        self.expect('THEN')  # Consume 'then'
+        then_branch = self.parse_expression()
+        
+        self.expect('ELSE')  # Consume 'else'
+        else_branch = self.parse_expression()
+        
+        return {
+            'type': 'if',
+            'condition': condition,
+            'then': then_branch,
+            'else': else_branch
+        }
+    
+    def parse_function_call(self, name):
+        """Parse a function call"""
+        self.next_token()  # Consume '('
+        
+        args = []
+        while self.current_token() and self.current_token()[0] != 'RPAREN':
+            args.append(self.parse_expression())
+            
+            # Check for comma separator
+            if self.current_token() and self.current_token()[0] == 'COMMA':
+                self.next_token()  # Consume comma
+        
+        self.expect('RPAREN')  # Consume ')'
+        
+        return {
+            'type': 'call',
+            'function': {'type': 'variable', 'name': name},
+            'args': args
+        }
+
+
+class LambdaToAst:
+    """Convert lambda calculus AST to Python AST"""
+    
+    def __init__(self):
+        # For tracking recursive functions
+        self.recursive_functions = set()
+        self.current_function = None
+    
+    def convert(self, lambda_ast):
+        """Convert lambda calculus AST to Python AST"""
+        return self.convert_expression(lambda_ast)
+    
+    def convert_expression(self, expr):
+        """Convert an expression from lambda calculus AST to Python AST"""
+        expr_type = expr['type']
+        
+        if expr_type == 'literal':
+            return ast.Constant(value=expr['value'])
+            
+        elif expr_type == 'variable':
+            return ast.Name(id=expr['name'], ctx=ast.Load())
+            
+        elif expr_type == 'lambda':
+            # Track current function for recursion
+            old_function = self.current_function
+            self.current_function = f"lambda_{id(expr)}"
+            
+            # Convert body
+            body_ast = self.convert_expression(expr['body'])
+            
+            # Check if this function is recursive
+            is_recursive = self.current_function in self.recursive_functions
+            
+            # Create the lambda function
+            if is_recursive:
+                # For recursive functions, we need to create a wrapper
+                # that defines the function with a name and uses Y combinator pattern
+                
+                # Create parameters
+                params = [ast.arg(arg=param, annotation=None) for param in expr['params']]
+                
+                # Create the function definition
+                func_def = ast.FunctionDef(
+                    name=self.current_function,
+                    args=ast.arguments(
+                        posonlyargs=[],
+                        args=params,
+                        kwonlyargs=[],
+                        kw_defaults=[],
+                        defaults=[],
+                        vararg=None,
+                        kwarg=None
+                    ),
+                    body=[ast.Return(value=body_ast)],
+                    decorator_list=[],
+                    returns=None
+                )
+                
+                # Create a module to hold the function
+                module = ast.Module(
+                    body=[func_def, ast.Expr(value=ast.Name(id=self.current_function, ctx=ast.Load()))],
+                    type_ignores=[]
+                )
+                
+                # Restore current function
+                self.current_function = old_function
+                
+                return module
+            else:
+                # Non-recursive lambda is simpler
+                lambda_ast = ast.Lambda(
+                    args=ast.arguments(
+                        posonlyargs=[],
+                        args=[ast.arg(arg=param, annotation=None) for param in expr['params']],
+                        kwonlyargs=[],
+                        kw_defaults=[],
+                        defaults=[],
+                        vararg=None,
+                        kwarg=None
+                    ),
+                    body=body_ast
+                )
+                
+                # Restore current function
+                self.current_function = old_function
+                
+                return lambda_ast
+                
+        elif expr_type == 'if':
+            return ast.IfExp(
+                test=self.convert_expression(expr['condition']),
+                body=self.convert_expression(expr['then']),
+                orelse=self.convert_expression(expr['else'])
+            )
+            
+        elif expr_type == 'call':
+            return ast.Call(
+                func=self.convert_expression(expr['function']),
+                args=[self.convert_expression(arg) for arg in expr['args']],
+                keywords=[]
+            )
+            
+        elif expr_type == 'recur':
+            # Mark the current function as recursive
+            self.recursive_functions.add(self.current_function)
+            
+            # Create a call to the current function
+            return ast.Call(
+                func=ast.Name(id=self.current_function, ctx=ast.Load()),
+                args=[self.convert_expression(arg) for arg in expr['args']],
+                keywords=[]
+            )
+            
+        else:
+            raise ValueError(f"Unknown expression type: {expr_type}")
+
+
+class LambdaInterpreter:
+    """Interpreter for lambda calculus expressions"""
+    
+    def __init__(self):
+        self.parser = LambdaParser()
+        self.converter = LambdaToAst()
+    
+    def parse(self, text):
+        """Parse lambda calculus expression to internal AST"""
+        return self.parser.parse(text)
+    
+    def convert_to_python_ast(self, lambda_ast):
+        """Convert internal AST to Python AST"""
+        return self.converter.convert(lambda_ast)
+    
+    def compile(self, python_ast):
+        """Compile Python AST to code object"""
+        # Fix missing locations
+        ast.fix_missing_locations(python_ast)
+        
+        # Convert AST to code object
+        if isinstance(python_ast, ast.Module):
+            code = compile(python_ast, '<lambda>', 'exec')
+        else:
+            module = ast.Module(body=[ast.Expr(value=python_ast)], type_ignores=[])
+            ast.fix_missing_locations(module)
+            code = compile(module, '<lambda>', 'eval')
+        
+        return code
+    
+    def evaluate(self, text):
+        """Evaluate a lambda calculus expression and return the result"""
+        # Parse to internal AST
+        lambda_ast = self.parse(text)
+        print("Internal AST:")
+        pprint(lambda_ast)
+        
+        # Convert to Python AST
+        python_ast = self.convert_to_python_ast(lambda_ast)
+        print("\nPython AST:")
+        print(ast.dump(python_ast, indent=2))
+        
+        # Compile to code object
+        code = self.compile(python_ast)
+        
+        # Create namespace
+        namespace = {}
+        
+        # Execute or evaluate
+        if isinstance(python_ast, ast.Module):
+            exec(code, namespace)
+            
+            # Get the result (the last defined function)
+            func_name = list(namespace.keys())[-1]
+            result = namespace[func_name]
+        else:
+            result = eval(code)
+        
+        return result
+
+
+# Example usage
+if __name__ == "__main__":
+    interpreter = LambdaInterpreter()
+    
+    # Test with examples
+    examples = [
+        "lambda x: x + 1",
+        "lambda (x, y): x + y",
+        "lambda n: if n < 2 then 1 else recur(n - 1) + recur(n - 2)",
+    ]
+    
+    for i, example in enumerate(examples):
+        print(f"\n\nExample {i+1}: {example}")
+        print("-" * 40)
+        
+        try:
+            # Parse and interpret
+            result = interpreter.evaluate(example)
+            
+            print("\nResult:", result)
+            
+            # Test the function if possible
+            if callable(result):
+                if i == 0:  # lambda x: x + 1
+                    test_result = result(5)
+                    print(f"result(5) = {test_result}")
+                elif i == 1:  # lambda (x, y): x + y
+                    test_result = result(3, 4)
+                    print(f"result(3, 4) = {test_result}")
+                elif i == 2:  # Fibonacci
+                    for n in range(10):
+                        test_result = result(n)
+                        print(f"result({n}) = {test_result}")
+        
+        except Exception as e:
+            print(f"Error: {e}")
+#+end_src
+
+Let's create an org-mode file that combines everything:
+
+#+begin_src org :tangle lambda_calculus_explorer.org :mkdirp t
+#+TITLE: Lambda Calculus and Python Bytecode Explorer
+#+AUTHOR: jwalsh
+#+DATE: [2025-04-04]
+#+PROPERTY: header-args:python :tangle lambda_calculus_explorer.py :mkdirp t
+
+* Lambda Calculus and Python Bytecode Explorer
+
+This project explores the connection between lambda calculus, Python's AST, and bytecode execution.
+
+** 1. Introduction
+
+Lambda calculus is a formal system in mathematical logic for expressing computation based on function abstraction and application. It forms the theoretical foundation for functional programming languages and influenced Python's lambda expressions.
+
+This explorer allows us to:
+- Parse lambda calculus expressions
+- Transform them into Python ASTs
+- Compile and execute them as Python bytecode
+- Visualize the execution model
+
+** 2. Implementation
+
+*** 2.1 Lambda Calculus Parser
+
+#+begin_src python
+"""
+Lambda Calculus Parser and Interpreter
+
+This module implements a parser and interpreter for a simplified lambda calculus syntax,
+translating it to Python bytecode for execution.
+"""
+
+import ast
+import re
+import dis
+import types
+import inspect
+import sys
+from pprint import pprint
+
+class LambdaParser:
+    """Parser for lambda calculus expressions"""
+    
+    def __init__(self):
+        self.tokens = []
+        self.position = 0
+    
+    def tokenize(self, text):
+        """Convert input string to tokens"""
+        # Token patterns
+        patterns = [
+            ('LPAREN', r'\('),
+            ('RPAREN', r'\)'),
+            ('LAMBDA', r'lambda'),
+            ('COLON', r':'),
+            ('IF', r'if'),
+            ('THEN', r'then'),
+            ('ELSE', r'else'),
+            ('RECUR', r'recur'),
+            ('NUMBER', r'\d+'),
+            ('OPERATOR', r'[\+\-\*/<>=]+'),
+            ('IDENTIFIER', r'[a-zA-Z_][a-zA-Z0-9_]*'),
+            ('COMMA', r','),
+            ('WHITESPACE', r'\s+'),
+        ]
+        
+        token_regex = '|'.join(f'(?P<{name}>{pattern})' for name, pattern in patterns)
+        
+        self.tokens = []
+        for match in re.finditer(token_regex, text):
+            token_type = match.lastgroup
+            token_value = match.group()
+            
+            if token_type != 'WHITESPACE':  # Skip whitespace
+                self.tokens.append((token_type, token_value))
+        
+        self.position = 0
+        return self.tokens
+    
+    def current_token(self):
+        """Get the current token"""
+        if self.position < len(self.tokens):
+            return self.tokens[self.position]
+        return None
+    
+    def next_token(self):
+        """Advance to the next token and return it"""
+        self.position += 1
+        return self.current_token()
+    
+    def expect(self, token_type):
+        """Expect a token of specific type, consume and return it"""
+        token = self.current_token()
+        if token and token[0] == token_type:
+            self.next_token()
+            return token
+        raise SyntaxError(f"Expected {token_type}, got {token}")
+    
+    def parse(self, text):
+        """Parse a lambda calculus expression and return an AST"""
+        self.tokenize(text)
+        return self.parse_expression()
+    
+    def parse_expression(self):
+        """Parse an expression"""
+        token = self.current_token()
+        
+        if not token:
+            raise SyntaxError("Unexpected end of input")
+        
+        if token[0] == 'LPAREN':
+            # Parse a parenthesized expression or lambda
+            self.next_token()  # Consume '('
+            
+            # Check if it's a lambda
+            if self.current_token() and self.current_token()[0] == 'LAMBDA':
+                return self.parse_lambda()
+            
+            # Regular parenthesized expression
+            expr = self.parse_expression()
+            self.expect('RPAREN')  # Consume ')'
+            return expr
+            
+        elif token[0] == 'LAMBDA':
+            # Lambda expression
+            return self.parse_lambda()
+            
+        elif token[0] == 'IF':
+            # If expression
+            return self.parse_if()
+            
+        elif token[0] == 'NUMBER':
+            # Number literal
+            value = int(token[1])
+            self.next_token()  # Consume number
+            return {'type': 'literal', 'value': value}
+            
+        elif token[0] == 'IDENTIFIER':
+            # Variable reference or function call
+            name = token[1]
+            self.next_token()  # Consume identifier
+            
+            # Check if it's a function call
+            if self.current_token() and self.current_token()[0] == 'LPAREN':
+                return self.parse_function_call(name)
+            
+            return {'type': 'variable', 'name': name}
+            
+        elif token[0] == 'RECUR':
+            # Recursive call
+            self.next_token()  # Consume 'recur'
+            
+            # Parse arguments
+            args = []
+            self.expect('LPAREN')
+            
+            while self.current_token() and self.current_token()[0] != 'RPAREN':
+                args.append(self.parse_expression())
+                
+                # Check for comma separator
+                if self.current_token() and self.current_token()[0] == 'COMMA':
+                    self.next_token()  # Consume comma
+            
+            self.expect('RPAREN')  # Consume ')'
+            
+            return {'type': 'recur', 'args': args}
+            
+        else:
+            raise SyntaxError(f"Unexpected token: {token}")
+    
+    def parse_lambda(self):
+        """Parse a lambda expression"""
+        self.next_token()  # Consume 'lambda'
+        
+        # Parse parameter(s)
+        params = []
+        
+        # Check for opening parenthesis for multiple params
+        if self.current_token() and self.current_token()[0] == 'LPAREN':
+            self.next_token()  # Consume '('
+            
+            while self.current_token() and self.current_token()[0] != 'RPAREN':
+                param_token = self.expect('IDENTIFIER')
+                params.append(param_token[1])
+                
+                # Check for comma separator
+                if self.current_token() and self.current_token()[0] == 'COMMA':
+                    self.next_token()  # Consume comma
+            
+            self.expect('RPAREN')  # Consume ')'
+        else:
+            # Single parameter
+            param_token = self.expect('IDENTIFIER')
+            params.append(param_token[1])
+        
+        # Parse body
+        self.expect('COLON')  # Consume ':'
+        body = self.parse_expression()
+        
+        return {
+            'type': 'lambda',
+            'params': params,
+            'body': body
+        }
+    
+    def parse_if(self):
+        """Parse an if expression"""
+        self.next_token()  # Consume 'if'
+        
+        condition = self.parse_expression()
+        
+        self.expect('THEN')  # Consume 'then'
+        then_branch = self.parse_expression()
+        
+        self.expect('ELSE')  # Consume 'else'
+        else_branch = self.parse_expression()
+        
+        return {
+            'type': 'if',
+            'condition': condition,
+            'then': then_branch,
+            'else': else_branch
+        }
+    
+    def parse_function_call(self, name):
+        """Parse a function call"""
+        self.next_token()  # Consume '('
+        
+        args = []
+        while self.current_token() and self.current_token()[0] != 'RPAREN':
+            args.append(self.parse_expression())
+            
+            # Check for comma separator
+            if self.current_token() and self.current_token()[0] == 'COMMA':
+                self.next_token()  # Consume comma
+        
+        self.expect('RPAREN')  # Consume ')'
+        
+        return {
+            'type': 'call',
+            'function': {'type': 'variable', 'name': name},
+            'args': args
+        }
+#+end_src
+
+*** 2.2 AST Transformer
+
+#+begin_src python
+class LambdaToAst:
+    """Convert lambda calculus AST to Python AST"""
+    
+    def __init__(self):
+        # For tracking recursive functions
+        self.recursive_functions = set()
+        self.current_function = None
+    
+    def convert(self, lambda_ast):
+        """Convert lambda calculus AST to Python AST"""
+        return self.convert_expression(lambda_ast)
+    
+    def convert_expression(self, expr):
+        """Convert an expression from lambda calculus AST to Python AST"""
+        expr_type = expr['type']
+        
+        if expr_type == 'literal':
+            return ast.Constant(value=expr['value'])
+            
+        elif expr_type == 'variable':
+            return ast.Name(id=expr['name'], ctx=ast.Load())
+            
+        elif expr_type == 'lambda':
+            # Track current function for recursion
+            old_function = self.current_function
+            self.current_function = f"lambda_{id(expr)}"
+            
+            # Convert body
+            body_ast = self.convert_expression(expr['body'])
+            
+            # Check if this function is recursive
+            is_recursive = self.current_function in self.recursive_functions
+            
+            # Create the lambda function
+            if is_recursive:
+                # For recursive functions, we need to create a wrapper
+                # that defines the function with a name and uses Y combinator pattern
+                
+                # Create parameters
+                params = [ast.arg(arg=param, annotation=None) for param in expr['params']]
+                
+                # Create the function definition
+                func_def = ast.FunctionDef(
+                    name=self.current_function,
+                    args=ast.arguments(
+                        posonlyargs=[],
+                        args=params,
+                        kwonlyargs=[],
+                        kw_defaults=[],
+                        defaults=[],
+                        vararg=None,
+                        kwarg=None
+                    ),
+                    body=[ast.Return(value=body_ast)],
+                    decorator_list=[],
+                    returns=None
+                )
+                
+                # Create a module to hold the function
+                module = ast.Module(
+                    body=[func_def, ast.Expr(value=ast.Name(id=self.current_function, ctx=ast.Load()))],
+                    type_ignores=[]
+                )
+                
+                # Restore current function
+                self.current_function = old_function
+                
+                return module
+            else:
+                # Non-recursive lambda is simpler
+                lambda_ast = ast.Lambda(
+                    args=ast.arguments(
+                        posonlyargs=[],
+                        args=[ast.arg(arg=param, annotation=None) for param in expr['params']],
+                        kwonlyargs=[],
+                        kw_defaults=[],
+                        defaults=[],
+                        vararg=None,
+                        kwarg=None
+                    ),
+                    body=body_ast
+                )
+                
+                # Restore current function
+                self.current_function = old_function
+                
+                return lambda_ast
+                
+        elif expr_type == 'if':
+            return ast.IfExp(
+                test=self.convert_expression(expr['condition']),
+                body=self.convert_expression(expr['then']),
+                orelse=self.convert_expression(expr['else'])
+            )
+            
+        elif expr_type == 'call':
+            return ast.Call(
+                func=self.convert_expression(expr['function']),
+                args=[self.convert_expression(arg) for arg in expr['args']],
+                keywords=[]
+            )
+            
+        elif expr_type == 'recur':
+            # Mark the current function as recursive
+            self.recursive_functions.add(self.current_function)
+            
+            # Create a call to the current function
+            return ast.Call(
+                func=ast.Name(id=self.current_function, ctx=ast.Load()),
+                args=[self.convert_expression(arg) for arg in expr['args']],
+                keywords=[]
+            )
+            
+        else:
+            raise ValueError(f"Unknown expression type: {expr_type}")
+#+end_src
+
+*** 2.3 Interpreter
+
+#+begin_src python
+class LambdaInterpreter:
+    """Interpreter for lambda calculus expressions"""
+    
+    def __init__(self):
+        self.parser = LambdaParser()
+        self.converter = LambdaToAst()
+    
+    def parse(self, text):
+        """Parse lambda calculus expression to internal AST"""
+        return self.parser.parse(text)
+    
+    def convert_to_python_ast(self, lambda_ast):
+        """Convert internal AST to Python AST"""
+        return self.converter.convert(lambda_ast)
+    
+    def compile(self, python_ast):
+        """Compile Python AST to code object"""
+        # Fix missing locations
+        ast.fix_missing_locations(python_ast)
+        
+        # Convert AST to code object
+        if isinstance(python_ast, ast.Module):
+            code = compile(python_ast, '<lambda>', 'exec')
+        else:
+            module = ast.Module(body=[ast.Expr(value=python_ast)], type_ignores=[])
+            ast.fix_missing_locations(module)
+            code = compile(module, '<lambda>', 'eval')
+        
+        return code
+    
+    def evaluate(self, text):
+        """Evaluate a lambda calculus expression and return the result"""
+        # Parse to internal AST
+        lambda_ast = self.parse(text)
+        print("Internal AST:")
+        pprint(lambda_ast)
+        
+        # Convert to Python AST
+        python_ast = self.convert_to_python_ast(lambda_ast)
+        print("\nPython AST:")
+        print(ast.dump(python_ast, indent=2))
+        
+        # Compile to code object
+        code = self.compile(python_ast)
+        
+        # Disassemble bytecode
+        print("\nBytecode:")
+        dis.dis(code)
+        
+        # Create namespace
+        namespace = {}
+        
+        # Execute or evaluate
+        if isinstance(python_ast, ast.Module):
+            exec(code, namespace)
+            
+            # Get the result (the last defined function)
+            func_name = list(namespace.keys())[-1]
+            result = namespace[func_name]
+        else:
+            result = eval(code)
+        
+        return result
+#+end_src
+
+*** 2.4 Command-line Interface
+
+#+begin_src python
+def main():
+    """Command-line interface"""
+    import argparse
+    
+    parser = argparse.ArgumentParser(description="Lambda Calculus Interpreter")
+    parser.add_argument('expression', nargs='?', default=None, help="Lambda calculus expression to evaluate")
+    parser.add_argument('--file', '-f', help="Read expression from file")
+    parser.add_argument('--test', '-t', action='store_true', help="Run test examples")
+    parser.add_argument('--bytecode', '-b', action='store_true', help="Show bytecode details")
+    
+    args = parser.parse_args()
+    
+    interpreter = LambdaInterpreter()
+    
+    if args.test:
+        run_tests(interpreter, args.bytecode)
+    elif args.file:
+        with open(args.file, 'r') as f:
+            expression = f.read().strip()
+        evaluate_and_test(interpreter, expression, args.bytecode)
+    elif args.expression:
+        evaluate_and_test(interpreter, args.expression, args.bytecode)
+    else:
+        # Interactive mode
+        print("Lambda Calculus Interpreter")
+        print("Enter expressions to evaluate (Ctrl+D to exit)")
+        try:
+            while True:
+                try:
+                    expression = input("> ")
+                    result = evaluate_and_test(interpreter, expression, args.bytecode)
+                except Exception as e:
+                    print(f"Error: {e}")
+        except EOFError:
+            print("\nExiting...")
+
+def run_tests(interpreter, show_bytecode=False):
+    """Run test examples"""
+    examples = [
+        "lambda x: x + 1",
+        "lambda (x, y): x + y",
+        "lambda n: if n < 2 then 1 else recur(n - 1) + recur(n - 2)",
+    ]
+    
+    for i, example in enumerate(examples):
+        print(f"\n\nExample {i+1}: {example}")
+        print("-" * 40)
+        
+        try:
+            # Parse and interpret
+            result = evaluate_and_test(interpreter, example, show_bytecode)
+        except Exception as e:
+            print(f"Error: {e}")
+
+def evaluate_and_test(interpreter, expression, show_bytecode=False):
+    """Evaluate an expression and test it with sample inputs"""
+    # Parse to internal AST
+    lambda_ast = interpreter.parse(expression)
+    print("Internal AST:")
+    pprint(lambda_ast)
+    
+    # Convert to Python AST
+    python_ast = interpreter.convert_to_python_ast(lambda_ast)
+    print("\nPython AST:")
+    print(ast.dump(python_ast, indent=2))
+    
+    # Compile to code object
+    code = interpreter.compile(python_ast)
+    
+    if show_bytecode:
+        print("\nBytecode:")
+        dis.dis(code)
+    
+    # Create namespace
+    namespace = {}
+    
+    # Execute or evaluate
+    if isinstance(python_ast, ast.Module):
+        exec(code, namespace)
+        
+        # Get the result (the last defined function)
+        func_name = list(namespace.keys())[-1]
+        result = namespace[func_name]
+    else:
+        result = eval(code)
+    
+    print("\nResult:", result)
+    
+    # Test the function if possible
+    if callable(result):
+        try:
+            # Test with example inputs based on the function signature
+            if expression.strip().startswith("lambda n:") and "recur" in expression:
+                # Fibonacci-like function
+                print("\nTesting with sample inputs:")
+                for n in range(10):
+                    test_result = result(n)
+                    print(f"result({n}) = {test_result}")
+            elif len(inspect.signature(result).parameters) == 1:
+                # Single parameter function
+                test_result = result(5)
+                print(f"\nTest with input 5: result(5) = {test_result}")
+            elif len(inspect.signature(result).parameters) == 2:
+                # Two parameter function
+                test_result = result(3, 4)
+                print(f"\nTest with inputs 3, 4: result(3, 4) = {test_result}")
+        except Exception as e:
+            print(f"\nError testing function: {e}")
+    
+    return result
+
+if __name__ == "__main__":
+    main()
+#+end_src
+
+*** 2.5 Bytecode Explorer for Lambda Expressions
+
+#+begin_src python
+def explore_bytecode(func, verbose=True):
+    """Explore bytecode details of a function"""
+    if not callable(func):
+        print("Not a callable function")
+        return
+    
+    if verbose:
+        print(f"\nExploring bytecode for: {func.__name__}")
+        
+    # Get code object
+    code = func.__code__
+    
+    # Basic code object info
+    if verbose:
+        print("\nCode object details:")
+        print(f"  Filename: {code.co_filename}")
+        print(f"  Name: {code.co_name}")
+        print(f"  Argument count: {code.co_argcount}")
+        print(f"  Number of locals: {code.co_nlocals}")
+        print(f"  Stack size: {code.co_stacksize}")
+        print(f"  Flags: {code.co_flags}")
+    
+    # Disassemble
+    print("\nBytecode disassembly:")
+    dis.dis(func)
+    
+    # Show important tables
+    if verbose:
+        print("\nConstants table:")
+        for i, const in enumerate(code.co_consts):
+            print(f"  [{i}] {const} ({type(const).__name__})")
+            
+        print("\nNames table:")
+        for i, name in enumerate(code.co_names):
+            print(f"  [{i}] {name}")
+            
+        print("\nVariable names:")
+        for i, var in enumerate(code.co_varnames):
+            print(f"  [{i}] {var}")
+    
+    # Show raw bytecode
+    if verbose:
+        print("\nRaw bytecode (hex):")
+        bytecode = code.co_code
+        hex_bytes = ' '.join(f'{b:02x}' for b in bytecode)
+        print(f"  {hex_bytes}")
+    
+    # Return code object for further analysis
+    return code
+#+end_src
+
+** 3. Mermaid Diagrams
+
+*** 3.1 Lambda Calculus Parsing Process
+
+#+begin_src mermaid :file lambda_parsing_process.png
+flowchart TD
+    A[Lambda Expression] -->|Tokenization| B[Tokens]
+    B -->|Parsing| C[Lambda AST]
+    C -->|AST Conversion| D[Python AST]
+    D -->|Compilation| E[Python Bytecode]
+    E -->|Execution| F[Result]
+    
+    subgraph "Internal Representation"
+    C
+    end
+    
+    subgraph "Python Native"
+    D
+    E
+    end
+#+end_src
+
+*** 3.2 Recursive Function Transformation
+
+#+begin_src mermaid :file recursive_transformation.png
+flowchart TD
+    A[Lambda with recur] -->|Analysis| B{Is Recursive?}
+    B -->|Yes| C[Function Definition]
+    B -->|No| D[Standard Lambda]
+    C -->|Y-Combinator Pattern| E[Self-Reference]
+    D --> F[Python Bytecode]
+    E --> F
+#+end_src
+
+** 4. Usage Example
+
+Here's how to use the lambda calculus interpreter:
+
+#+begin_src sh :results output
+# Run the Fibonacci example
+python lambda_calculus_explorer.py "lambda n: if n < 2 then 1 else recur(n - 1) + recur(n - 2)"
+
+# Show detailed bytecode
+python lambda_calculus_explorer.py -b "lambda n: if n < 2 then 1 else recur(n - 1) + recur(n - 2)"
+
+# Run all test examples
+python lambda_calculus_explorer.py -t
+#+end_src
+
+** 5. Extending the Interpreter
+
+The lambda calculus interpreter can be extended to support more features:
+
+- Church numerals and encoding
+- List representation using pairs
+- Boolean operations
+- Y combinators for recursion
+- Type checking
+
+*** 5.1 Church Encoding Example
+
+#+begin_src python
+def church_encoding_example():
+    """Example of Church encoding in Python"""
+    # Church numerals
+    zero = lambda f: lambda x: x
+    one = lambda f: lambda x: f(x)
+    two = lambda f: lambda x: f(f(x))
+    three = lambda f: lambda x: f(f(f(x)))
+    
+    # Church operations
+    successor = lambda n: lambda f: lambda x: f(n(f)(x))
+    add = lambda m: lambda n: lambda f: lambda x: m(f)(n(f)(x))
+    multiply = lambda m: lambda n: lambda f: m(n(f))
+    
+    # Church to int converter
+    church_to_int = lambda church: church(lambda x: x + 1)(0)
+    
+    # Test and print results
+    print("Church numerals and operations:")
+    print(f"zero = {church_to_int(zero)}")
+    print(f"one = {church_to_int(one)}")
+    print(f"two = {church_to_int(two)}")
+    print(f"three = {church_to_int(three)}")
+    print(f"successor(zero) = {church_to_int(successor(zero))}")
+    print(f"add(one)(two) = {church_to_int(add(one)(two))}")
+    print(f"multiply(two)(three) = {church_to_int(multiply(two)(three))}")
+    
+    # Examine bytecode
+    print("\nBytecode for 'successor' function:")
+    dis.dis(successor)
+    
+    return zero, one, two, three, successor, add, multiply, church_to_int
+
+if __name__ == "__main__":
+    church_encoding_example()
+#+end_src
+
+** 6. Python Interpreter Connection
+
+The connection between lambda calculus and Python's interpreter lies in how Python implements first-class functions, closures, and bytecode execution:
+
+#+begin_src python
+def show_interpreter_connection():
+    """Demonstrate the connection between lambda calculus and Python's VM"""
+    # Define a closure
+    def make_adder(x):
+        return lambda y: x + y
+    
+    # Create function instances
+    add5 = make_adder(5)
+    add10 = make_adder(10)
+    
+    # Examine the function objects
+    print("Function objects:")
+    print(f"add5: {add5}")
+    print(f"add10: {add10}")
+    
+    # Examine closures
+    print("\nClosure cells:")
+    print(f"add5.__closure__: {add5.__closure__}")
+    print(f"add5.__closure__[0].cell_contents: {add5.__closure__[0].cell_contents}")
+    print(f"add10.__closure__[0].cell_contents: {add10.__closure__[0].cell_contents}")
+    
+    # Disassemble the functions
+    print("\nBytecode comparison:")
+    print("add5 bytecode:")
+    dis.dis(add5)
+    print("\nadd10 bytecode:")
+    dis.dis(add10)
+    
+    # They share the same code object!
+    print("\nCode object comparison:")
+    print(f"add5.__code__ is add10.__code__: {add5.__code__ is add10.__code__}")
+    
+    return add5, add10
+
+if __name__ == "__main__":
+    show_interpreter_connection()
+#+end_src
+#+end_src
+
+Let's test our implementation with the Fibonacci example:
+
+#+begin_src sh :results output
+# First, make sure the file is executable
+chmod +x lambda_calculus_explorer.py
+
+# Run the Fibonacci example
+./lambda_calculus_explorer.py "lambda n: if n < 2 then 1 else recur(n - 1) + recur(n - 2)"
+#+end_src
+
+** Notes on Implementation
+
+The lambda calculus parser and interpreter here demonstrates:
+
+1. How to parse a domain-specific language into an AST
+2. How to transform between different AST representations
+3. How recursive functions are implemented in Python
+4. How bytecode is generated and executed
+5. The deep connection between lambda calculus and Python's functional features
+
+This implementation provides insights into how Python's interpreter works under the hood, especially for functional programming constructs like lambda functions.
